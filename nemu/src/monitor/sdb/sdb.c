@@ -55,7 +55,11 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_help(char *args);
+
+//Customed tools.
 static int cmd_si(char *args);
+static int cmd_info(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -67,6 +71,7 @@ static struct {
 
   /* TODO: Add more commands */
 	{ "si", "Usage: si [N] Execute N(default 1) instruction(s) then stop", cmd_si },
+	{ "info", "Usage: info [rw], r for test regs, w for test watching points", cmd_info },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -94,6 +99,25 @@ static int cmd_si(char *args)
 	//auto stop?
 	return 0;
 }
+
+static int cmd_info(char *args)
+{
+	char *arg = strtok(NULL, " ");
+
+	if (arg == NULL) {
+		const int cmdi = 4;
+		printf("%s\n", cmd_table[cmdi].description);
+	}
+	else {
+		if (strcmp(arg, "r") == 0) {
+			isa_reg_display();
+		}
+		//TODO:: info w
+	}
+
+	return 0;
+}
+
 static int cmd_help(char *args) {
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
