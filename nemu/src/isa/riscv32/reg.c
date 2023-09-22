@@ -30,8 +30,8 @@ void isa_reg_display()
 	int rfsize = MUXDEF(CONFIG_RVE, 16, 32);
 	//register file size.
 
-	for (int i = 0; i < rfsize; ++i) {
-		printf("%s\t%lx\t%lu\n", regs[i], cpu.gpr[i], cpu.gpr[i]);		
+	for (int i = 0, j = 0; i < rfsize; ++i) {
+		printf("%s\t%lx\t%lu%c", regs[i], cpu.gpr[i], cpu.gpr[i], j++ % 2 ? '\n' : '\t');		
 	}
 }
 
