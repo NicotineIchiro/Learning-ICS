@@ -91,7 +91,7 @@ static int cmd_si(char *args)
 
 		cpu_exec(n);
 	}
-
+	//auto stop?
 	return 0;
 }
 static int cmd_help(char *args) {
