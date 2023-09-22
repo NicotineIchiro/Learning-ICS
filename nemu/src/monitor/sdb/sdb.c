@@ -49,6 +49,7 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
+	//TODO: is it good ?
   nemu_state.state = NEMU_END;
   return -1;
 }
@@ -65,7 +66,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-	{ "si", "[N] Execute N(default 1) instruction(s) then stop", cmd_si },
+	{ "si", "Usage: si [N] Execute N(default 1) instruction(s) then stop", cmd_si },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -113,6 +114,8 @@ static int cmd_help(char *args) {
     }
     printf("Unknown command '%s'\n", arg);
   }
+
+	//TODO:stop.
   return 0;
 }
 
