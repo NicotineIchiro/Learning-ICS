@@ -65,7 +65,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-	{ "si [N]", "Execute N(default 1) instruction(s) then stop", cmd_si },
+	{ "si", "[N] Execute N(default 1) instruction(s) then stop", cmd_si },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
