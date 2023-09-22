@@ -54,7 +54,7 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_help(char *args);
-//static int cmd_si(char *args);
+static int cmd_si(char *args);
 static struct {
   const char *name;
   const char *description;
@@ -65,24 +65,34 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-	//{ "si [N]", "Execute N(default 1) instruction(s) then stop", cmd_si },
+	{ "si [N]", "Execute N(default 1) instruction(s) then stop", cmd_si },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
-//static int cmd_si(char *args)
-//{
-//	char *arg = strtok(NULL, " ");
-//	int i;
+static int cmd_si(char *args)
+{
+	char *arg = strtok(NULL, " ");
+	//int i;
 
-	//TODO... What cpu state cannot exec?
-//	if (nemu_state.state);
+//TODO... What cpu state cannot exec?
+	//if (nemu_state.state);
 
-	//the cpu state must be ?
-	//
-//	if (arg == NULL){
-//		execute(1);
-//	}
-//}
+//the cpu state must be ?
+//
+	if (arg == NULL) {
+		cpu_exec(1);
+	}
+	else {
+		uint64_t n;
+		n = (uint64_t)atoi(arg);
+		if ((int)n < 0)
+			printf("Warning: Implicit type transforming from int to uint.\n");
+
+		cpu_exec(n);
+	}
+
+	return 0;
+}
 static int cmd_help(char *args) {
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
