@@ -131,9 +131,11 @@ static int cmd_x(char *args)
 		printf("%s\n", cmd_table[cmdi].description);
 	} else {
 		uint8_t N = atoi(argN);
-		vaddr_t b_addr = atoi(argExpr);
+		//vaddr_t b_addr = atoi(argExpr);
+		vaddr_t b_addr;
+		sscanf(argExpr, "%lx", &b_addr);
 
-		for (int i = 0; i < N; ++i) {
+		for (uint8_t i = 0; i < N; ++i) {
 			vaddr_t iaddr;
 			uint32_t iword;
 
