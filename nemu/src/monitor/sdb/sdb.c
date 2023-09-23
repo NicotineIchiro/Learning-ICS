@@ -17,6 +17,7 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <memory/paddr.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
@@ -59,6 +60,7 @@ static int cmd_help(char *args);
 //Customed tools.
 static int cmd_si(char *args);
 static int cmd_info(char *args);
+static int cmd_x(char *args);
 
 static struct {
   const char *name;
@@ -72,6 +74,7 @@ static struct {
   /* TODO: Add more commands */
 	{ "si", "Usage: si [N] Execute N(default 1) instruction(s) then stop", cmd_si },
 	{ "info", "Usage: info [rw], r for test regs, w for test watching points", cmd_info },
+	{ "x", "Usage: x [N] Expr, read N words begin at address Expr", cmd_x },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -117,6 +120,32 @@ static int cmd_info(char *args)
 
 	return 0;
 }
+
+static int cmd_x(char *args)
+{
+	char *argN = strtok(NULL, " ");
+	char *argExpr = strtok(NULL, " ");
+
+	if (argN == NULL || argExpr == NULL) {
+		const int cmdi = 5;
+		printf("%s\n", cmd_table[cmdi].description);
+	} else {
+		uint8_t N = atoi(argN);
+		vaddr_t b_addr = atoi(argExpr);
+
+		for (int i = 0; i < N; ++i) {
+			vaddr_t iaddr;
+			uint32_t iword;
+
+			iaddr = b_addr + i * 4;
+			iword = paddr_read(iaddr, 4);
+
+			printf("%lx:\t%x\n", iaddr, iword);
+		}	
+	}
+	return 0;
+}
+
 
 static int cmd_help(char *args) {
   /* extract the first argument */
