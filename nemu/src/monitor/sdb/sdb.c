@@ -17,7 +17,7 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <memory/paddr.h>
+#include <memory/vaddr.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
@@ -138,7 +138,7 @@ static int cmd_x(char *args)
 			uint32_t iword;
 
 			iaddr = b_addr + i * 4;
-			iword = paddr_read(iaddr, 4);
+			iword = vaddr_read(iaddr, 4);
 
 			printf("%lx:\t%x\n", iaddr, iword);
 		}	
