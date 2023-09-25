@@ -35,7 +35,8 @@ static struct rule {
   /* TODO: Add more rules.
    * Pay attention to the precedence level of different rules.
    */
-  {" +", TK_NOTYPE},    // spaces  <- Why add an plus? <- one or more space.
+  {" +", TK_NOTYPE},    // spaces  <- Why add an plus? <- one or more space
+	{"\\n", TK_NOTYPE},
 	{"\\(", '('},
 	{"\\)", ')'},
 	{"\\*", '*'},
