@@ -110,7 +110,7 @@ static bool make_token(char *e) {
 						//TODO: buffer overflow treat
 						break;
           default: //TODO();
-						i = NR_REGEX;
+						i = NR_REGEX - 1;
 						break;
         }
 
