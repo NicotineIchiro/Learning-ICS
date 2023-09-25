@@ -20,6 +20,7 @@
  */
 #include <regex.h>
 #include <string.h>
+#include <debug.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
 
@@ -74,6 +75,7 @@ typedef struct token {
 } Token;
 
 static Token tokens[32] __attribute__((used)) = {};
+static int token_i = 0;
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -99,15 +101,20 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-
+				Assert(token_i < 32, "Number of token exceeds capacity!\n");
         switch (rules[i].token_type) {
 					case TK_NOTYPE:
 						break;
 					case '(': case ')': case '*': case '/': case '+': case '-': case TK_EQ:
-						strncpy(tokens[i].str, substr_start, substr_len);
+						strncpy(tokens[token_i].str, substr_start, substr_len);
+						tokens[token_i].type = rules[i].token_type;
+						token_i++;
 						break;
 					case TK_NUM:
-						strncpy(tokens[i].str, substr_start, substr_len);
+						Assert(substr_len < 32, "Single token buffer overflow!\n");
+						strncpy(tokens[token_i].str, substr_start, substr_len);
+						tokens[token_i].type = rules[i].token_type;
+						token_i++;
 						//TODO: buffer overflow treat
 						break;
           default: //TODO();
@@ -118,12 +125,12 @@ static bool make_token(char *e) {
         break;
       }
     }
-
+		token_i = 0;
     if (i == NR_REGEX) {
       printf("no match at position %d\n%s\n%*.s^\n", position, e, position, "");
       return false;
     }
-  }
+	}
 	for (int j = 0; j < 32; ++j)
 		printf("%s ", tokens[j].str);
 
