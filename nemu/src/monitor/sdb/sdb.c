@@ -61,6 +61,7 @@ static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char *args);
+static int cmd_parse(char *args);
 
 static struct {
   const char *name;
@@ -75,9 +76,17 @@ static struct {
 	{ "si", "Usage: si [N] Execute N(default 1) instruction(s) then stop", cmd_si },
 	{ "info", "Usage: info [rw], r for test regs, w for test watching points", cmd_info },
 	{ "x", "Usage: x [N] Expr, read N words begin at address Expr", cmd_x },
+	{ "parse", "Usage: parse Expr, return the parse result", cmd_parse}
 };
 
 #define NR_CMD ARRLEN(cmd_table)
+static int cmd_parse(char *args)
+{
+	static bool result;
+	result = true;
+	expr(args, &result);
+	return result;
+}
 static int cmd_si(char *args)
 {
 	char *arg = strtok(NULL, " ");
@@ -152,6 +161,8 @@ static int cmd_x(char *args)
 static int cmd_help(char *args) {
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
+	//the strtok will remain the static char * 
+	//after the last call.
   int i;
 
   if (arg == NULL) {
