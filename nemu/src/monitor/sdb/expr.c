@@ -27,7 +27,10 @@ enum {
   /* TODO: Add more token types */
 	TK_NUM,
 };
-
+enum {
+	BE_ERREXPR = 512,
+	IN_PARMATCH,
+};
 static struct rule {
   const char *regex;
   int token_type;
@@ -136,6 +139,72 @@ static bool make_token(char *e) {
   return true;
 }
 
+static bool check_parentheses(uint32_t p, uint32_t q) {
+	if (tokens[p].type != '(' || tokens[q].type != ')')
+		return false;
+	//TODO... How to treat the bad parentheses expr?
+	int pth_deep = 0;
+
+		
+}
+static uint32_t eval(uint32_t p, uint32_t q) {
+	//end eval when meet illegal expr.
+	if (p > q) {
+		return BE_ERREXPR;
+		//when bad expression, end prog;
+	}
+	else if (p == q) {
+		//terminology?
+		return atoi(tokens[p].str);
+	}
+	else if (check_parentheses(p, q) == true) {
+		return eval(p + 1, q - 1);
+	}
+	else {
+		//TODO...
+		//parentheses unmatch || no parenthses but legal
+		//get main op;
+		int main_opi = -1;
+		size_t token_len;
+		int pth_deep = 0;
+		for (uint32_t i = p; i < q; ++i) {
+			switch(tokens[i].type) {
+				case '(':
+					pth_deep++;
+					break;
+				case ')':
+					pth_deep--;
+					break;
+				case '*': case '/':
+					if (pth_deep != 0) continue;
+	
+					if (main_opi == -1 || tokens[main_opi].type == '*' || \
+						 	tokens[main_opi].type == '/') {
+						main_opi = i;
+					}
+					break;
+				case '+': case '-':
+					if (pth_deep != 0) continue;
+
+						main_opi = i;
+					break;
+				default:
+					continue;
+			}
+		}
+
+		uint32_t val1 = eval(p, main_opi - 1);
+		uint32_t val2 = eval(main + 1, q);
+
+		switch (tokens[main_opi].type) {
+			case '+':	return val1 + val2;
+			case '-': return val1 - val2;
+			case '*': return val1 * val2;
+			case '/': return val1 / val2;
+			default: Assert(0, "No legal main operator!\n");
+		}
+	}
+}
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -144,6 +213,10 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
+	//1:for token in tokens
+	//	eval(token, 0, strlen(token.str))
+	//
+	//2:eval(0, arrlen(tokens));
   TODO();
 
   return 0;
