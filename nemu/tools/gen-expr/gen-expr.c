@@ -19,7 +19,6 @@
 #include <time.h>
 #include <assert.h>
 #include <string.h>
-
 // this should be enough
 static char buf[65536] = {};
 static char code_buf[65536 + 128] = {}; // a little larger than `buf`
@@ -30,8 +29,13 @@ static char *code_format =
 "  printf(\"%%u\", result); "
 "  return 0; "
 "}";
+
 static int buf_i __attribute__((used)) = 0;
-inline bool BUF_FULL() { return buf_i >= 65535 }
+uint32_t choose(uint32_t n) {
+	return (uint32_t)rand() % n;
+}
+#define BUF_MAX 20
+int BUF_FULL() { return buf_i >= BUF_MAX; }
 void set_buf_end()
 {
 	buf_i++;
@@ -45,19 +49,20 @@ static void gen_rand_op() {
 	i = choose(5);
 	char op_list[] = {'*', '/', '+', '-'};
 	
-	if (i < 4)
+	if (i < 4) {
 		buf[buf_i] = op_list[i];
+		set_buf_end();
+	}
 	else {
-		strncpy(buf, "==", 2);
-		buf_i++;
+		strncpy(buf, "==", 3);
+		buf_i += 2;	
 	}
 	
-	set_buf_end();
 }
 static void gen(char ch) {
 	if (BUF_FULL()) return;
 
-	Assert(ch == '(' || ch == ')', "the argument to gen() must be '(' or ')'\n");
+	assert(ch == '(' || ch == ')');
 	buf[buf_i] = ch;
 	
 	set_buf_end();
@@ -66,10 +71,10 @@ static void gen_num() {
 	if (BUF_FULL()) return;
 
 	int length;
-	length = choose(32);
+	length = choose(BUF_MAX < 32 ? 3 : 32);
 	for (int i = 0; i < length; ++i){
 		int rand_offset;
-		rand_offset = choose(11);
+		rand_offset = choose(10);
 		
 		buf[buf_i] = '0' + rand_offset;
 		buf_i++;
@@ -80,6 +85,7 @@ static void gen_num() {
 
 static void gen_rand_expr() {
   //buf[0] = '\0';
+	
 	switch (choose(3)) {
 		case 0: gen_num(); break;
 		case 1: gen('('); gen_rand_expr(); gen(')'); break;
@@ -94,6 +100,7 @@ int main(int argc, char *argv[]) {
   if (argc > 1) {
     sscanf(argv[1], "%d", &loop);
   }
+	buf_i = 0;
   int i;
   for (i = 0; i < loop; i ++) {
     gen_rand_expr();
