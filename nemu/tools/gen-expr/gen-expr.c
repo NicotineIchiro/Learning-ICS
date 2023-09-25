@@ -30,9 +30,61 @@ static char *code_format =
 "  printf(\"%%u\", result); "
 "  return 0; "
 "}";
+static int buf_i __attribute__((used)) = 0;
+inline bool BUF_FULL() { return buf_i >= 65535 }
+void set_buf_end()
+{
+	buf_i++;
+	buf[buf_i] = '\0';
+}
+static void gen_rand_op() {
+	if (BUF_FULL())	return;
+
+
+	int i;
+	i = choose(5);
+	char op_list[] = {'*', '/', '+', '-'};
+	
+	if (i < 4)
+		buf[buf_i] = op_list[i];
+	else {
+		strncpy(buf, "==", 2);
+		buf_i++;
+	}
+	
+	set_buf_end();
+}
+static void gen(char ch) {
+	if (BUF_FULL()) return;
+
+	Assert(ch == '(' || ch == ')', "the argument to gen() must be '(' or ')'\n");
+	buf[buf_i] = ch;
+	
+	set_buf_end();
+}
+static void gen_num() {
+	if (BUF_FULL()) return;
+
+	int length;
+	length = choose(32);
+	for (int i = 0; i < length; ++i){
+		int rand_offset;
+		rand_offset = choose(11);
+		
+		buf[buf_i] = '0' + rand_offset;
+		buf_i++;
+	}
+
+	buf_i = '\0';
+}
 
 static void gen_rand_expr() {
-  buf[0] = '\0';
+  //buf[0] = '\0';
+	switch (choose(3)) {
+		case 0: gen_num(); break;
+		case 1: gen('('); gen_rand_expr(); gen(')'); break;
+		default: gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;
+	}
 }
 
 int main(int argc, char *argv[]) {

@@ -85,6 +85,7 @@ static int cmd_parse(char *args)
 	static bool result;
 	result = true;
 	expr(args, &result);
+	
 	return result;
 }
 static int cmd_si(char *args)
