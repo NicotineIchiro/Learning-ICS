@@ -75,7 +75,7 @@ typedef struct token {
 } Token;
 
 static Token tokens[32] __attribute__((used)) = {};
-static int token_i = 0;
+//static int nr_token = 0;
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -101,20 +101,20 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-				Assert(token_i < 32, "Number of token exceeds capacity!\n");
+				Assert(nr_token < 32, "Number of token exceeds capacity!\n");
         switch (rules[i].token_type) {
 					case TK_NOTYPE:
 						break;
 					case '(': case ')': case '*': case '/': case '+': case '-': case TK_EQ:
-						strncpy(tokens[token_i].str, substr_start, substr_len);
-						tokens[token_i].type = rules[i].token_type;
-						token_i++;
+						strncpy(tokens[nr_token].str, substr_start, substr_len);
+						tokens[nr_token].type = rules[i].token_type;
+						nr_token++;
 						break;
 					case TK_NUM:
 						Assert(substr_len < 32, "Single token buffer overflow!\n");
-						strncpy(tokens[token_i].str, substr_start, substr_len);
-						tokens[token_i].type = rules[i].token_type;
-						token_i++;
+						strncpy(tokens[nr_token].str, substr_start, substr_len);
+						tokens[nr_token].type = rules[i].token_type;
+						nr_token++;
 						//TODO: buffer overflow treat
 						break;
           default: //TODO();
@@ -125,7 +125,7 @@ static bool make_token(char *e) {
         break;
       }
     }
-		token_i = 0;
+		nr_token = 0;
     if (i == NR_REGEX) {
       printf("no match at position %d\n%s\n%*.s^\n", position, e, position, "");
       return false;
