@@ -167,6 +167,7 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 static uint64_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
 	if (p > q) {
+		//TODO: Cannot reach here?
 		be_flag = true;
 		Log("Error: recursion basis BE.\n");
 		return VAL_ERREXPR;
@@ -192,7 +193,7 @@ static uint64_t eval(uint32_t p, uint32_t q) {
 		//size_t token_len;
 		//TODO... token buf OF
 		int pth_deep = 0;
-		for (uint32_t i = p; i < q; ++i) {
+		for (uint32_t i = p; i <= q; ++i) {
 			switch(tokens[i].type) {
 				case '(':
 					pth_deep++;
@@ -221,7 +222,7 @@ static uint64_t eval(uint32_t p, uint32_t q) {
 
 		uint64_t val1 = eval(p, main_opi - 1);
 		uint64_t val2 = eval(main_opi + 1, q);
-
+		//if (be_flag)
 		switch (tokens[main_opi].type) {
 			case '+':	return val1 + val2;
 			case '-': return val1 - val2;
