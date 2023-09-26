@@ -185,7 +185,7 @@ static uint64_t eval(uint32_t p, uint32_t q) {
 		//get main op;
 		if (be_flag)
 		{
-			Log("Error: c_p detect BE, hence do no treat to the expr.\n");
+			//Log("Error: c_p detect BE, hence do no treat to the expr.\n");
 			return VAL_ERREXPR;
 		}
 		int main_opi = -1;
