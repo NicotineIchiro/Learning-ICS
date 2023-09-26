@@ -27,7 +27,7 @@ enum {
   /* TODO: Add more token types */
 	TK_NUM,
 };
-const uint64_t VAL_ERREXPR = (uint64_t)(-1);
+const uint32_t VAL_ERREXPR = (uint32_t)(-1);
 static struct rule {
   const char *regex;
   int token_type;
@@ -169,12 +169,12 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 	return outside_match;
 		
 } 
-static uint64_t eval(uint32_t p, uint32_t q) {
+static uint32_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
 	if (p > q) {
 		//TODO: Cannot reach here?
 		be_flag = true;
-		Log("Error: recursion basis BE.\n");
+		Log("Error: recursion basis bad expr.");
 		return VAL_ERREXPR;
 		//TODO:when bad expression...;
 	}
@@ -225,8 +225,8 @@ static uint64_t eval(uint32_t p, uint32_t q) {
 			}
 		}
 
-		uint64_t val1 = eval(p, main_opi - 1);
-		uint64_t val2 = eval(main_opi + 1, q);
+		uint32_t val1 = eval(p, main_opi - 1);
+		uint32_t val2 = eval(main_opi + 1, q);
 		//if (be_flag)
 		switch (tokens[main_opi].type) {
 			case '+':	return val1 + val2;
@@ -250,7 +250,7 @@ word_t expr(char *e, bool *success) {
 	word_t result = eval(0, nr_token - 1);
 	if (be_flag) {
 		*success	= false;
-		Log("Error: Bad expression.\n");
+		Log("Error: Bad expression.");
 		return (word_t)VAL_ERREXPR;
 	}
 	printf("Value == %lu\n", result);
