@@ -30,11 +30,14 @@ static char *code_format =
 "  return 0; "
 "}";
 
-static int buf_i __attribute__((used)) = 0;
+static int buf_i __attribute__((used))  = 0;
 uint32_t choose(uint32_t n) {
-	return (uint32_t)rand() % n;
+	uint32_t result;
+	result = rand() % n;
+	//while ((result = rand() % n) == 0);
+	return result;
 }
-#define BUF_MAX 20
+#define BUF_MAX 50
 int BUF_FULL() { return buf_i >= BUF_MAX; }
 void set_buf_end()
 {
@@ -44,7 +47,7 @@ void set_buf_end()
 static void gen_rand_op() {
 	if (BUF_FULL())	return;
 
-
+	printf("gen_op() ");
 	int i;
 	i = choose(5);
 	char op_list[] = {'*', '/', '+', '-'};
@@ -57,34 +60,48 @@ static void gen_rand_op() {
 		strncpy(buf, "==", 3);
 		buf_i += 2;	
 	}
-	
+	printf("buf_i: %d\n", buf_i);
+
+	return;
 }
 static void gen(char ch) {
 	if (BUF_FULL()) return;
-
+	printf("gen\'%c\'	", ch);
 	assert(ch == '(' || ch == ')');
 	buf[buf_i] = ch;
-	
+	printf("buf_i before set: %d\n", buf_i);	
 	set_buf_end();
+	//buf_i++;
+	//buf[buf_i] = '\0';
+	printf("buf_i: %d\n", buf_i);
+
+	return;
 }
 static void gen_num() {
 	if (BUF_FULL()) return;
-
-	int length;
-	length = choose(BUF_MAX < 32 ? 3 : 32);
+	printf("gen_num() ");
+	//const int UINT64_MAXL = 18;
+	int length = 5;
+	//while ((length = choose(BUF_MAX < UINT64_MAXL	? 3 : BUF_MAX / 5)) == 0 );
 	for (int i = 0; i < length; ++i){
-		int rand_offset;
-		rand_offset = choose(10);
+		char rand_nc;
+		rand_nc = '0' + choose(10);
 		
-		buf[buf_i] = '0' + rand_offset;
+		buf[buf_i] = rand_nc;
+		
 		buf_i++;
 	}
-
+	while (buf[buf_i - length] == '0' && length > 1) {
+		buf[buf_i - length] = choose(10) + '0';
+	}
+	printf("buf_i: %d\n", buf_i);
 	buf_i = '\0';
+
+	return;
 }
 
 static void gen_rand_expr() {
-  //buf[0] = '\0';
+  buf[0] = '\0';
 	
 	switch (choose(3)) {
 		case 0: gen_num(); break;
@@ -100,11 +117,10 @@ int main(int argc, char *argv[]) {
   if (argc > 1) {
     sscanf(argv[1], "%d", &loop);
   }
-	buf_i = 0;
   int i;
   for (i = 0; i < loop; i ++) {
     gen_rand_expr();
-
+		printf("buf: %s\n", buf);
     sprintf(code_buf, code_format, buf);
 
     FILE *fp = fopen("/tmp/.code.c", "w");

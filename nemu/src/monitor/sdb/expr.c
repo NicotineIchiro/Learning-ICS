@@ -27,10 +27,7 @@ enum {
   /* TODO: Add more token types */
 	TK_NUM,
 };
-enum {
-	BE_ERREXPR = 512,
-	IN_PARMATCH,
-};
+const uint64_t VAL_ERREXPR = (uint64_t)(-1);
 static struct rule {
   const char *regex;
   int token_type;
@@ -138,20 +135,42 @@ static bool make_token(char *e) {
 
   return true;
 }
-
+static bool be_flag = false;
 static bool check_parentheses(uint32_t p, uint32_t q) {
 	if (tokens[p].type != '(' || tokens[q].type != ')')
 		return false;
 	//TODO... How to treat the bad parentheses expr?
+	bool outside_match = true;
 	int pth_deep = 0;
+	for (uint32_t i = p; i <= q; ++i) {
+		switch (tokens[i].type) {
+			case '(':
+				pth_deep++;
+				break;
+			case ')':
+				pth_deep--;
+				if (pth_deep < 0 || \
+					 (tokens[i-1].type != TK_NUM && tokens[i-1].type != ')')) {
+					be_flag = true;
+					return false;//BAD EXPR
+				}
+				if (i != q && pth_deep == 0)
+					outside_match = false;
+				break;
+			default:
+				continue;	
+		}
+	}
 
+	return outside_match;
 		
-}
-static uint32_t eval(uint32_t p, uint32_t q) {
+} 
+static uint64_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
 	if (p > q) {
-		return BE_ERREXPR;
-		//when bad expression, end prog;
+		be_flag = true;
+		return VAL_ERREXPR;
+		//TODO:when bad expression...;
 	}
 	else if (p == q) {
 		//terminology?
@@ -164,8 +183,11 @@ static uint32_t eval(uint32_t p, uint32_t q) {
 		//TODO...
 		//parentheses unmatch || no parenthses but legal
 		//get main op;
+		if (be_flag)
+			return VAL_ERREXPR;
 		int main_opi = -1;
-		size_t token_len;
+		//size_t token_len;
+		//TODO... token buf OF
 		int pth_deep = 0;
 		for (uint32_t i = p; i < q; ++i) {
 			switch(tokens[i].type) {
@@ -176,7 +198,8 @@ static uint32_t eval(uint32_t p, uint32_t q) {
 					pth_deep--;
 					break;
 				case '*': case '/':
-					if (pth_deep != 0) continue;
+					if (pth_deep != 0) 
+						continue;
 	
 					if (main_opi == -1 || tokens[main_opi].type == '*' || \
 						 	tokens[main_opi].type == '/') {
@@ -184,17 +207,17 @@ static uint32_t eval(uint32_t p, uint32_t q) {
 					}
 					break;
 				case '+': case '-':
-					if (pth_deep != 0) continue;
-
-						main_opi = i;
+					if (pth_deep != 0) 
+						continue;
+					main_opi = i;
 					break;
 				default:
 					continue;
 			}
 		}
 
-		uint32_t val1 = eval(p, main_opi - 1);
-		uint32_t val2 = eval(main + 1, q);
+		uint64_t val1 = eval(p, main_opi - 1);
+		uint64_t val2 = eval(main_opi + 1, q);
 
 		switch (tokens[main_opi].type) {
 			case '+':	return val1 + val2;
@@ -217,7 +240,15 @@ word_t expr(char *e, bool *success) {
 	//	eval(token, 0, strlen(token.str))
 	//
 	//2:eval(0, arrlen(tokens));
-  TODO();
+	be_flag = false;
+	word_t result = eval(0, nr_token);
+	if (be_flag) {
+		*success	= false;
+		printf("Error: Bad expression.\n");
+		return VAL_ERREXPR;
+	}
+	return result;
+  //TODO();
 
   return 0;
 }
