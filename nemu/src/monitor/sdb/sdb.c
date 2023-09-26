@@ -84,9 +84,8 @@ static int cmd_parse(char *args)
 {
 	static bool result;
 	result = true;
-	expr(args, &result);
-	
-	return result;
+	uint64_t val = expr(args, &result);	
+	return (int)val;
 }
 static int cmd_si(char *args)
 {
