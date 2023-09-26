@@ -168,6 +168,7 @@ static uint64_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
 	if (p > q) {
 		be_flag = true;
+		Log("Error: recursion basis BE.\n");
 		return VAL_ERREXPR;
 		//TODO:when bad expression...;
 	}
@@ -183,7 +184,10 @@ static uint64_t eval(uint32_t p, uint32_t q) {
 		//parentheses unmatch || no parenthses but legal
 		//get main op;
 		if (be_flag)
+		{
+			Log("Error: c_p detect BE, hence do no treat to the expr.\n");
 			return VAL_ERREXPR;
+		}
 		int main_opi = -1;
 		//size_t token_len;
 		//TODO... token buf OF
@@ -235,15 +239,12 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-	//1:for token in tokens
-	//	eval(token, 0, strlen(token.str))
-	//
 	//2:eval(0, arrlen(tokens));
 	be_flag = false;
 	word_t result = eval(0, nr_token - 1);
 	if (be_flag) {
 		*success	= false;
-		printf("Error: Bad expression.\n");
+		Log("Error: Bad expression.\n");
 		return VAL_ERREXPR;
 	}
 	printf("Value == %lu\n", result);
