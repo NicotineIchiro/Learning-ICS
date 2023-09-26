@@ -69,7 +69,7 @@ static void gen(char ch) {
 	printf("gen\'%c\'	", ch);
 	assert(ch == '(' || ch == ')');
 	buf[buf_i] = ch;
-	printf("buf_i before set: %d\n", buf_i);	
+	//printf("buf_i before set: %d\n", buf_i);	
 	set_buf_end();
 	//buf_i++;
 	//buf[buf_i] = '\0';
@@ -101,7 +101,7 @@ static void gen_num() {
 }
 
 static void gen_rand_expr() {
-  buf[0] = '\0';
+  //buf[0] = '\0';
 	
 	switch (choose(3)) {
 		case 0: gen_num(); break;
