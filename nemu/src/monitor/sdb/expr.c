@@ -241,14 +241,15 @@ word_t expr(char *e, bool *success) {
 	//
 	//2:eval(0, arrlen(tokens));
 	be_flag = false;
-	word_t result = eval(0, nr_token);
+	word_t result = eval(0, nr_token - 1);
 	if (be_flag) {
 		*success	= false;
 		printf("Error: Bad expression.\n");
 		return VAL_ERREXPR;
 	}
 	return result;
-  //TODO();
+		
+    //TODO();
 
   return 0;
 }
