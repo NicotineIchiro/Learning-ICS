@@ -144,6 +144,11 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 	for (uint32_t i = p; i <= q; ++i) {
 		switch (tokens[i].type) {
 			case '(':
+				if (i != p && \
+						(tokens[i-1].type == TK_NUM || tokens[i-1].type == ')')) {
+					be_flag = true;
+					return false;
+				}
 				pth_deep++;
 				break;
 			case ')':
