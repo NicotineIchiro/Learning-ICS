@@ -85,7 +85,7 @@ static int cmd_parse(char *args)
 	static bool result;
 	result = true;
 	word_t val = expr(args, &result);
-	Log("Reach here");	
+	//Log("Reach here");	
 	return (int)val;
 }
 static int cmd_si(char *args)
