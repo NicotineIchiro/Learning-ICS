@@ -82,7 +82,7 @@ static struct {
 #define NR_CMD ARRLEN(cmd_table)
 static int cmd_parse(char *args)
 {
-	bool result;
+	static bool result;
 	result = true;
 	word_t val = expr(args, &result);
 	Log("Reach here");	
