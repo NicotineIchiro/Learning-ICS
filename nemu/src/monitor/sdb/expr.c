@@ -166,7 +166,7 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 } 
 static uint64_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
-	if (p > q || p < 0 || q >= nr_token) {
+	if (p > q) {
 		be_flag = true;
 		Log("Error: recursion basis BE.\n");
 		return VAL_ERREXPR;
