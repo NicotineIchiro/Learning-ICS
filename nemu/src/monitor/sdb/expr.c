@@ -245,7 +245,7 @@ word_t expr(char *e, bool *success) {
 	if (be_flag) {
 		*success	= false;
 		Log("Error: Bad expression.\n");
-		return VAL_ERREXPR;
+		return (word_t)VAL_ERREXPR;
 	}
 	printf("Value == %lu\n", result);
 	return result;
