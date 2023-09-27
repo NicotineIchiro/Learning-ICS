@@ -101,7 +101,8 @@ static void gen_num() {
 
 static void gen_rand_expr() {
   //buf[0] = '\0';
-	
+	//TODO: The end of expr must be NUM or matched right parth
+	//			to avoid bad expression.	
 	switch (choose(3)) {
 		case 0: gen_num(); break;
 		case 1: gen('('); gen_rand_expr(); gen(')'); break;
