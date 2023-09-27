@@ -30,7 +30,7 @@ static char *code_format =
 "  return 0; "
 "}";
 
-static int buf_i __attribute__((used))  = 0;
+static int buf_i = 0;
 uint32_t choose(uint32_t n) {
 	uint32_t result;
 	result = rand() % n;
@@ -49,17 +49,15 @@ static void gen_rand_op() {
 
 	printf("gen_op() ");
 	int i;
-	i = choose(5);
+	i = choose(4);//TODO: Now ignore "=="
 	char op_list[] = {'*', '/', '+', '-'};
 	
-	if (i < 4) {
+//	if (i < 4) {
 		buf[buf_i] = op_list[i];
 		set_buf_end();
-	}
-	else {
-		strncpy(buf, "==", 3);
-		buf_i += 2;	
-	}
+//	}
+//	else {
+//		buf[buf_i] = '=';
 	printf("buf_i: %d\n", buf_i);
 
 	return;
@@ -81,12 +79,13 @@ static void gen_num() {
 	if (BUF_FULL()) return;
 	printf("gen_num() ");
 	//const int UINT64_MAXL = 18;
-	int length = 5;
+	int length;
+	while ((length = choose(5)) == 0);
 	//while ((length = choose(BUF_MAX < UINT64_MAXL	? 3 : BUF_MAX / 5)) == 0 );
 	for (int i = 0; i < length; ++i){
 		char rand_nc;
 		rand_nc = '0' + choose(10);
-		
+					
 		buf[buf_i] = rand_nc;
 		
 		buf_i++;
@@ -95,7 +94,7 @@ static void gen_num() {
 		buf[buf_i - length] = choose(10) + '0';
 	}
 	printf("buf_i: %d\n", buf_i);
-	buf_i = '\0';
+	buf[buf_i]	= '\0';
 
 	return;
 }
