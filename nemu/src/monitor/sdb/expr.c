@@ -147,6 +147,7 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 				if (i != p && \
 						(tokens[i-1].type == TK_NUM || tokens[i-1].type == ')')) {
 					be_flag = true;
+					Log("Error: <Num> \'(\' bad expression.");
 					return false;
 				}
 				pth_deep++;
@@ -156,6 +157,7 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 				if (pth_deep < 0 || \
 					 (tokens[i-1].type != TK_NUM && tokens[i-1].type != ')')) {
 					be_flag = true;
+					Log("Error: Brackets unmatched bad expression.");
 					return false;//BAD EXPR
 				}
 				if (i != q && pth_deep == 0)
@@ -174,7 +176,7 @@ static uint32_t eval(uint32_t p, uint32_t q) {
 	if (p > q) {
 		//TODO: Cannot reach here?
 		be_flag = true;
-		Log("Error: recursion basis bad expr.");
+		Log("Error: Basic bad expression.");
 		return VAL_ERREXPR;
 		//TODO:when bad expression...;
 	}
@@ -250,7 +252,7 @@ word_t expr(char *e, bool *success) {
 	word_t result = eval(0, nr_token - 1);
 	if (be_flag) {
 		*success	= false;
-		Log("Error: Bad expression.");
+		//Log("Error: Bad expression.");
 		return (word_t)VAL_ERREXPR;
 	}
 	//TODO: How to detect OF?
