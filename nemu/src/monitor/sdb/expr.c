@@ -253,6 +253,7 @@ word_t expr(char *e, bool *success) {
 		Log("Error: Bad expression.");
 		return (word_t)VAL_ERREXPR;
 	}
+	//TODO: How to detect OF?
 	printf("Value == %lu\n", result);
 	return result;
 		
