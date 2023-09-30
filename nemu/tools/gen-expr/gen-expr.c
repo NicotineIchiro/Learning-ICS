@@ -113,11 +113,11 @@ static void gen_num() {
 }
 //static int emergency_return = 0;
 static int rec_depth = 0;
-static void rec_indent(int n)
-{
-	for (int i = 1; i <= n; ++i)
-		printf("  ");
-}
+//static void rec_indent(int n)
+//{
+//	for (int i = 1; i <= n; ++i)
+//		printf("  ");
+//}
 
 static void gen_rand_expr() {
   //buf[0] = '\0';
@@ -126,9 +126,14 @@ static void gen_rand_expr() {
 	int i;
 	i = buf_enough() ? choose(3) : 0;	
 	rec_depth++;
-	char * BNF[] = {"<NUM>", "\'(\'<expr>\')\'", "<expr> op <expr>"};
-	rec_indent(rec_depth);
-	printf("%s in depth %d\n", BNF[i], rec_depth);
+
+	// Debug Log
+	//char * BNF[] = {"<NUM>", "\'(\'<expr>\')\'", "<expr> op <expr>"};
+	//rec_indent(rec_depth);
+	//printf("%s in depth %d\n", BNF[i], rec_depth);
+	// Debug Log
+	
+	//TODO: random insert space
 	switch (i) {
 		case 0:	
 			gen_num(); break;
@@ -144,8 +149,9 @@ static void gen_rand_expr() {
 			break;
 		default: 
 			gen_rand_expr();
-//			if (!buf_enough())
-//				break;
+			if (!buf_enough())
+				break;
+
 			gen_rand_op(); 
 			gen_rand_expr();
 			break;
@@ -165,7 +171,7 @@ int main(int argc, char *argv[]) {
   for (i = 0; i < loop; i ++) {
     gen_rand_expr();
 		buf_i = 0;
-		printf("buf: %s\n", buf);
+		//printf("buf: %s\n", buf);
     sprintf(code_buf, code_format, buf);
 
     FILE *fp = fopen("/tmp/.code.c", "w");
@@ -179,10 +185,11 @@ int main(int argc, char *argv[]) {
     fp = popen("/tmp/.expr", "r");
     assert(fp != NULL);
 
-    int result;
+    uint32_t result;//Originally int.
     ret = fscanf(fp, "%d", &result);
     pclose(fp);
 
+		//TODO: Only printf if no warning.
     printf("%u %s\n", result, buf);
   }
   return 0;
