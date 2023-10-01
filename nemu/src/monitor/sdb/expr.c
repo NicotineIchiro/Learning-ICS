@@ -100,7 +100,7 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-				Assert(nr_token < 32, "Number of token exceeds capacity!\n");
+				Assert(nr_token < TOKENS_LEN, "Number of token exceeds capacity!\n");
         switch (rules[i].token_type) {
 					case TK_NOTYPE:
 						break;
