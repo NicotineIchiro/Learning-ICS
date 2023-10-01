@@ -171,7 +171,7 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 	return outside_match;
 		
 } 
-static uint32_t eval(uint32_t p, uint32_t q) {
+static word_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
 	if (p > q) {
 		//TODO: Cannot reach here?
@@ -227,8 +227,8 @@ static uint32_t eval(uint32_t p, uint32_t q) {
 			}
 		}
 
-		uint32_t val1 = eval(p, main_opi - 1);
-		uint32_t val2 = eval(main_opi + 1, q);
+		word_t val1 = eval(p, main_opi - 1);
+		word_t val2 = eval(main_opi + 1, q);
 		//if (be_flag)
 		switch (tokens[main_opi].type) {
 			case '+':	return val1 + val2;
