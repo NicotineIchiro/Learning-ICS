@@ -211,8 +211,8 @@ void sdb_mainloop() {
 		ret_expr = expr(exprbuf, &flag);
 
 		if (ret_expr != result)
-			printf("CASE %d\n" \
-						 "result: %lu\t parse: %lu\n", i, result, ret_expr);
+			printf("CASE %d:\t%s\n" \
+						 "result: %lu\t parse: %lu\n", i, exprbuf, result, ret_expr);
 
 		memset(exprbuf, 0, sizeof(exprbuf));
 	}
