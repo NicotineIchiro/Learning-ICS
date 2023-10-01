@@ -204,8 +204,8 @@ int main(int argc, char *argv[]) {
     fp = popen("/tmp/.expr", "r");
     assert(fp != NULL);
 
-    uint32_t result;//Originally int.
-    ret = fscanf(fp, "%u", &result);
+    int result;//Originally int.
+    ret = fscanf(fp, "%d", &result);
     pclose(fp);
 
 		//TODO: Only printf if no warning.
