@@ -210,7 +210,7 @@ void sdb_mainloop() {
 	flag = 0;
 	for (int i = 0; i < 10000 ;++i) {
 		fgets(testline, sizeof(testline), fp);
-		sscanf(testline, "%lu %s", &ret_expr, exprbuf);
+		sscanf(testline, "%lu %s", &result, exprbuf);
 
 		ret_expr = expr(exprbuf, &flag);
 
