@@ -190,6 +190,7 @@ void sdb_set_batch_mode() {
   is_batch_mode = true;
 }
 char exprbuf[1024];
+char testline[2048];
 void sdb_mainloop() {
   if (is_batch_mode) {
     cmd_c(NULL);
@@ -207,7 +208,10 @@ void sdb_mainloop() {
 	result = 0;
 	ret_expr = 0;
 	flag = 0;
-	for (int i = 0; fscanf(fp, "%lu %s", &result, exprbuf) ;++i) {
+	for (int i = 0; i < 10000 ;++i) {
+		fgets(testline, sizeof(testline), fp);
+		sscanf(testline, "%lu %s", &ret_expr, exprbuf);
+
 		ret_expr = expr(exprbuf, &flag);
 
 		if (ret_expr != result)
