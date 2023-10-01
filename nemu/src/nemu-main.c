@@ -27,6 +27,22 @@ int main(int argc, char *argv[]) {
 #else
   init_monitor(argc, argv);
 #endif
+//TEST GEN_EXPR
+	char exprbuf[1024];
+	FILE *fp;
+	fp = fopen("$NEMU_HOME/tools/gen-expr/output", "r");
+	assert(fp != NULL);
+	uint32_t result;
+	for (int i = 0; fscanf(fp, "%d %s", &result, exprbuf) != EOF;++i) {
+		bool flag;
+		flag = true;
+		uint32_t parse_result;
+
+		if ((parse_result = expr(exprbuf, &flag)) != result)
+			printf("Case %d: %s\nParse:%u, Result:%u\n");
+	}
+
+//TEST GEN_EXPR
 
   /* Start engine. */
   engine_start();
