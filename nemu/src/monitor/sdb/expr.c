@@ -256,7 +256,7 @@ word_t expr(char *e, bool *success) {
 		return (word_t)VAL_ERREXPR;
 	}
 	//TODO: How to detect OF?
-	printf("Value == %lu\n", result);
+	//printf("Value == %lu\n", result);
 	return result;
 		
     //TODO();

@@ -189,13 +189,37 @@ static int cmd_help(char *args) {
 void sdb_set_batch_mode() {
   is_batch_mode = true;
 }
-
+char exprbuf[1024];
 void sdb_mainloop() {
   if (is_batch_mode) {
     cmd_c(NULL);
     return;
   }
 
+	/*Test gen_expr*/
+	FILE *fp;
+	fp = fopen("/home/nicotine/ics2023/nemu/tools/gen-expr/output", "r");
+	assert(fp != NULL);
+	word_t result;
+	word_t ret_expr;
+	bool flag;
+
+	result = 0;
+	ret_expr = 0;
+	flag = 0;
+	for (int i = 0; fscanf(fp, "%lu %s", &result, exprbuf) ;++i) {
+		ret_expr = expr(exprbuf, &flag);
+
+		if (ret_expr != result)
+			printf("CASE %d\n" \
+						 "result: %lu\t parse: %lu\n", i, result, ret_expr);
+
+		memset(exprbuf, 0, sizeof(exprbuf));
+	}
+
+	fclose(fp);
+	/*Test gen_expr*/
+	
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
 
