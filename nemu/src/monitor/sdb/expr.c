@@ -73,8 +73,8 @@ typedef struct token {
   int type;
   char str[32];
 } Token;
-
-static Token tokens[32] __attribute__((used)) = {};
+#define TOKENS_LEN 1024
+static Token tokens[TOKENS_LEN] __attribute__((used)) = {};
 //static int nr_token = 0;
 static int nr_token __attribute__((used))  = 0;
 
@@ -110,7 +110,7 @@ static bool make_token(char *e) {
 						nr_token++;
 						break;
 					case TK_NUM:
-						Assert(substr_len < 32, "Single token buffer overflow!\n");
+						Assert(substr_len < TOKENS_LEN, "Single token buffer overflow!\n");
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].type = rules[i].token_type;
 						nr_token++;
