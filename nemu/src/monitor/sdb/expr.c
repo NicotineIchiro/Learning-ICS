@@ -21,6 +21,7 @@
 #include <regex.h>
 #include <string.h>
 #include <debug.h>
+#include <ctype.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
 
@@ -96,27 +97,44 @@ static bool make_token(char *e) {
 
         position += substr_len;
 
-        /* TODO: Now a new token is recognized with rules[i]. Add codes
+        /*  Now a new token is recognized with rules[i]. Add codes
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
 				Assert(nr_token < TOKENS_LEN, "Number of token exceeds capacity!\n");
+
+				//TODO: minus num
         switch (rules[i].token_type) {
 					case TK_NOTYPE:
 						break;
-					case '(': case ')': case '*': case '/': case '+': case '-': case TK_EQ:
+					case '-':
+						if (nr_token == 0 || tokens[nr_token-1].type == '(' || tokens[nr_token-1].type == '/' || tokens[nr_token-1] == '+' || tokens[nr_token-1] == '*') {
+							//TODO: Ignoring minus list.
+							strncpy(tokens[nr_token].str, substr_start, substr_len);
+							tokens[nr_token].type = TK_NUM;
+							nr_token++;
+							break;							
+						}
+					case '(': case ')': case '*': case '/': case '+': case TK_EQ:
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].type = rules[i].token_type;
 						nr_token++;
 						break;
 					case TK_NUM:
 						Assert(substr_len < TOKENS_LEN, "Single token buffer overflow!\n");
+						//if in front of num there is a NUM type '-', cat the num after the '-'
+						if (nr_token > 0 && strcmp(tokens[nr_token-1].str, "-") == 0 && tokens[nr_token-1].type == TK_NUM) {
+							strncat(tokens[nr_token-1].str, substr_start, substr_len);
+							//nr_token++;
+							break;		
+						}
+						
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].type = rules[i].token_type;
 						nr_token++;
 						//TODO: buffer overflow treat
 						break;
-          default: //TODO();
+          default:
 						i = NR_REGEX - 1;
 						break;
         }
