@@ -84,7 +84,8 @@ static bool parse_result;
 static int cmd_parse(char *args)
 {
 	parse_result = true;
-	expr(args, &parse_result);
+	//expr(args, &parse_result);
+	printf("Value: %lu", expr(args, &parse_result));
 	//Log("Reach here");	
 	return parse_result == true ? 0 : -1;
 }
