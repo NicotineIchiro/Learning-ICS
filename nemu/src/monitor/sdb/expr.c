@@ -23,10 +23,10 @@
 #include <debug.h>
 #include <ctype.h>
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_AND,
 
   /* TODO: Add more token types */
-	TK_NUM,
+	TK_NUM, TK_HEX, TK_REG, TK_DEREF
 };
 const uint32_t VAL_ERREXPR = (uint32_t)(-1);
 static struct rule {
@@ -46,6 +46,10 @@ static struct rule {
   {"\\+", '+'},         // plus
 	{"\\-", '-'},
   {"==", TK_EQ},        // equal
+	{"!=", TK_NEQ},
+	{"&&", TK_AND},
+	{"0x[[:xdigit:]]+", TK_HEX},
+	{"\\$(\\$0|[[:alnum:]]{2,3})", TK_REG},//BRE or ERE?
 	{"[[:digit:]]+", TK_NUM},
 };
 
@@ -105,36 +109,37 @@ static bool make_token(char *e) {
          */
 				Assert(nr_token < TOKENS_NUM, "Number of token exceeds capacity!\n");
 
-				//TODO: minus num cannot be well recognized in <expr> op <expr>.
+				//TODO: Some new token type.
         switch (rules[i].token_type) {
 					case TK_NOTYPE:
 						break;
+					case '*':	
 					case '-':
 						if (nr_token == 0 || tokens[nr_token-1].type == '(' || tokens[nr_token-1].type == '/' || tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '-') {
 							//TODO: Ignoring minus list.
 							strncpy(tokens[nr_token].str, substr_start, substr_len);
-							tokens[nr_token].type = TK_NUM;
+							tokens[nr_token].type = rules[i].token_type == '-' ? TK_NUM : TK_DEREF;
 							nr_token++;
 							break;							
 						}
-					case '(': case ')': case '*': case '/': case '+': case TK_EQ:
+					case '(': case ')':  case '/': case '+': case TK_EQ: case TK_NEQ: case TK_AND:
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].type = rules[i].token_type;
 						nr_token++;
 						break;
 					case TK_NUM:
-						Assert(substr_len < TOKENS_NUM, "Single token buffer overflow!\n");
+						//Assert(substr_len < TOKEN_LEN, "Single token buffer overflow!\n");
+						//Single of is treated in in front of switch.
 						//if in front of num there is a NUM type '-', cat the num after the '-'
 						if (nr_token > 0 && strcmp(tokens[nr_token-1].str, "-") == 0 && tokens[nr_token-1].type == TK_NUM) {
 							strncat(tokens[nr_token-1].str, substr_start, substr_len);
 							//nr_token++;
 							break;		
 						}
-						
+					case TK_HEX:
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].type = rules[i].token_type;
 						nr_token++;
-						//TODO: buffer overflow treat
 						break;
           default:
 						i = NR_REGEX - 1;
