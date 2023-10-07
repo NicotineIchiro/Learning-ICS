@@ -211,7 +211,7 @@ static word_t eval(uint32_t p, uint32_t q) {
 		//terminology?
 		if (tokens[p].type == TK_NUM)
 			return atoi(tokens[p].str);
-		else if (tokens[p].type == TK_HEX)
+		else
 			return (word_t)strtoul(tokens[p].str, NULL, 16);
 	}
 	else if (check_parentheses(p, q) == true) {
