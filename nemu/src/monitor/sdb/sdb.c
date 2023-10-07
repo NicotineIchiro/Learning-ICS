@@ -198,30 +198,29 @@ void sdb_mainloop() {
   }
 
 	/*Test gen_expr*/
-	FILE *fp;
-	fp = fopen("/home/nicotine/ics2023/nemu/tools/gen-expr/output", "r");
-	assert(fp != NULL);
-	word_t result;
-	word_t ret_expr;
-	bool flag;
-
-	result = 0;
-	ret_expr = 0;
-	flag = 0;
-	for (int i = 0; i < 10000 ;++i) {
-		fgets(testline, sizeof(testline), fp);
-		sscanf(testline, "%lu %s", &result, exprbuf);
-
-		ret_expr = expr(exprbuf, &flag);
-
-		if (ret_expr != result)
-			printf("CASE %d:\t%s\n" \
-						 "result: %lu\t parse: %lu\n", i, exprbuf, result, ret_expr);
-
-		memset(exprbuf, 0, sizeof(exprbuf));
-	}
-
-	fclose(fp);
+//	FILE *fp;
+//	fp = fopen("/home/nicotine/ics2023/nemu/tools/gen-expr/output", "r");
+//	assert(fp != NULL);
+//	word_t result;
+//	word_t ret_expr;
+//	bool flag;
+//
+//	result = 0;
+//	ret_expr = 0;
+//	flag = 0;
+//	for (int i = 0; i < 10000 ;++i) {
+//		fgets(testline, sizeof(testline), fp);
+//		sscanf(testline, "%lu %s", &result, exprbuf);
+//
+//		ret_expr = expr(exprbuf, &flag);
+//
+//		if (ret_expr != result)
+//			printf("CASE %d:\t%s\nresult: %lu\t parse: %lu\n", i, exprbuf, result, ret_expr);
+//
+//		memset(exprbuf, 0, sizeof(exprbuf));
+//	}
+//
+//	fclose(fp);
 	/*Test gen_expr*/
 	
   for (char *str; (str = rl_gets()) != NULL; ) {
