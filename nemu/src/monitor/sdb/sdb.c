@@ -86,7 +86,7 @@ static int cmd_parse(char *args)
 	parse_result = true;
 	expr(args, &parse_result);
 	//Log("Reach here");	
-	return 0;
+	return parse_result == true ? 0 : -1;
 }
 static int cmd_si(char *args)
 {
