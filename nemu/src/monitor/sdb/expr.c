@@ -105,7 +105,7 @@ static bool make_token(char *e) {
          */
 				Assert(nr_token < TOKENS_NUM, "Number of token exceeds capacity!\n");
 
-				//TODO: minus num
+				//TODO: minus num cannot be well recognized in <expr> op <expr>.
         switch (rules[i].token_type) {
 					case TK_NOTYPE:
 						break;
