@@ -110,7 +110,7 @@ static bool make_token(char *e) {
 					case TK_NOTYPE:
 						break;
 					case '-':
-						if (nr_token == 0 || tokens[nr_token-1].type == '(' || tokens[nr_token-1].type == '/' || tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '*') {
+						if (nr_token == 0 || tokens[nr_token-1].type == '(' || tokens[nr_token-1].type == '/' || tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '*' || tokens[nr_token].type == '-') {
 							//TODO: Ignoring minus list.
 							strncpy(tokens[nr_token].str, substr_start, substr_len);
 							tokens[nr_token].type = TK_NUM;
