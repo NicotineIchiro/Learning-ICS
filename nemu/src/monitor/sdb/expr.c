@@ -69,13 +69,13 @@ void init_regex() {
     }
   }
 }
-
+#define TOKEN_LEN 32
 typedef struct token {
   int type;
-  char str[32];
+  char str[TOKEN_LEN];
 } Token;
-#define TOKENS_LEN 1024
-static Token tokens[TOKENS_LEN] __attribute__((used)) = {};
+#define TOKENS_NUM 1024
+static Token tokens[TOKENS_NUM] __attribute__((used)) = {};
 //static int nr_token = 0;
 static int nr_token __attribute__((used))  = 0;
 
@@ -85,6 +85,8 @@ static bool make_token(char *e) {
   regmatch_t pmatch;
 
   nr_token = 0;
+	for (int i = 0; strlen(tokens[i].str) != 0; ++i)
+		memset(tokens[i].str, 0, TOKEN_LEN);
 
   while (e[position] != '\0') {
     /* Try all rules one by one. */
@@ -94,14 +96,14 @@ static bool make_token(char *e) {
         int substr_len = pmatch.rm_eo;
 
         //Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",i, rules[i].regex, position, substr_len, substr_len, substr_start);
-
+				Assert(substr_len < TOKEN_LEN, "Single token buf overflow!\n");
         position += substr_len;
 
         /*  Now a new token is recognized with rules[i]. Add codes
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-				Assert(nr_token < TOKENS_LEN, "Number of token exceeds capacity!\n");
+				Assert(nr_token < TOKENS_NUM, "Number of token exceeds capacity!\n");
 
 				//TODO: minus num
         switch (rules[i].token_type) {
@@ -121,7 +123,7 @@ static bool make_token(char *e) {
 						nr_token++;
 						break;
 					case TK_NUM:
-						Assert(substr_len < TOKENS_LEN, "Single token buffer overflow!\n");
+						Assert(substr_len < TOKENS_NUM, "Single token buffer overflow!\n");
 						//if in front of num there is a NUM type '-', cat the num after the '-'
 						if (nr_token > 0 && strcmp(tokens[nr_token-1].str, "-") == 0 && tokens[nr_token-1].type == TK_NUM) {
 							strncat(tokens[nr_token-1].str, substr_start, substr_len);
