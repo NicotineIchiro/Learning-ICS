@@ -200,7 +200,7 @@ static word_t eval(uint32_t p, uint32_t q) {
 		return VAL_ERREXPR;
 		//TODO:when bad expression...;
 	}
-	else if (p == q) {
+	else if (p == q) { //TODO: Min number?
 		//terminology?
 		return atoi(tokens[p].str);
 	}
