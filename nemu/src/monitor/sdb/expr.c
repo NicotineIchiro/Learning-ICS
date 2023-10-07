@@ -136,10 +136,14 @@ static bool make_token(char *e) {
 							//nr_token++;
 							break;		
 						}
+					case TK_REG:
+						//TODO..
 					case TK_HEX:
 						strncpy(tokens[nr_token].str, substr_start, substr_len);
 						tokens[nr_token].type = rules[i].token_type;
 						nr_token++;
+						break;
+						
 						break;
           default:
 						i = NR_REGEX - 1;
@@ -199,21 +203,21 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 static word_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
 	if (p > q) {
-		//TODO: Cannot reach here?
 		be_flag = true;
 		Log("Error: Basic bad expression.");
 		return VAL_ERREXPR;
-		//TODO:when bad expression...;
 	}
-	else if (p == q) { //TODO: Min number?
+	else if (p == q) { 
 		//terminology?
-		return atoi(tokens[p].str);
+		if (tokens[p].type == TK_NUM)
+			return atoi(tokens[p].str);
+		else if (tokens[p].type == TK_HEX)
+			return (word_t)strtoul(tokens[p].str, NULL, 16);
 	}
 	else if (check_parentheses(p, q) == true) {
 		return eval(p + 1, q - 1);
 	}
 	else {
-		//TODO...
 		//parentheses unmatch || no parenthses but legal
 		//get main op;
 		if (be_flag)
@@ -221,10 +225,12 @@ static word_t eval(uint32_t p, uint32_t q) {
 			//Log("Error: c_p detect BE, hence do no treat to the expr.\n");
 			return VAL_ERREXPR;
 		}
+		//TODO:Multiple char op?
 		int main_opi = -1;
 		//size_t token_len;
 		//TODO... token buf OF
 		int pth_deep = 0;
+		
 		for (uint32_t i = p; i <= q; ++i) {
 			switch(tokens[i].type) {
 				case '(':
@@ -232,18 +238,57 @@ static word_t eval(uint32_t p, uint32_t q) {
 					break;
 				case ')':
 					pth_deep--;
-					break;
+					break;	
 				case '*': case '/':
 					if (pth_deep != 0) 
 						continue;
 	
-					if (main_opi == -1 || tokens[main_opi].type == '*' || \
-						 	tokens[main_opi].type == '/') {
+					if (main_opi == -1) {
 						main_opi = i;
+					}
+					else {
+						switch (tokens[main_opi].type) {
+							case '*': case '/':
+								main_opi = i;
+								break;
+							default:
+								break;
+						}
 					}
 					break;
 				case '+': case '-':
 					if (pth_deep != 0) 
+						continue;
+					if (main_opi == -1) {
+						main_opi = i;
+						break;
+					}
+
+					switch (tokens[main_opi].type) {
+						case '*': case '/': case '+': case '-':
+							main_opi = i;
+							break;
+						default:
+							break;
+					}
+					break;
+				case TK_AND:
+					if (pth_deep != 0)
+						continue;
+					if (main_opi == -1) {
+						main_opi = i;
+						break;
+					}
+					switch (tokens[main_opi].type) {
+						case '*': case '/': case '+': case '-': case TK_AND:
+							main_opi = i;
+							break;
+						default:
+							break;
+					}
+					break;
+				case TK_EQ: case TK_NEQ:
+					if (pth_deep != 0)
 						continue;
 					main_opi = i;
 					break;
@@ -251,11 +296,14 @@ static word_t eval(uint32_t p, uint32_t q) {
 					continue;
 			}
 		}
-
+		//TODO: reg and deref
 		word_t val1 = eval(p, main_opi - 1);
 		word_t val2 = eval(main_opi + 1, q);
 		//if (be_flag)
 		switch (tokens[main_opi].type) {
+			case TK_EQ: return val1 == val2;
+			case TK_NEQ: return val1 != val2;
+			case TK_AND: return val1 && val2;
 			case '+':	return val1 + val2;
 			case '-': return val1 - val2;
 			case '*': return val1 * val2;
