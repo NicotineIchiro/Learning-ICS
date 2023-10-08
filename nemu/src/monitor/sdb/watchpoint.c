@@ -16,13 +16,15 @@
 #include "sdb.h"
 
 #define NR_WP 32
-
+#define EXPR_LEN 512
 typedef struct watchpoint {
   int NO;
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
-
+	//about the variable pointed.
+	char expr_str[EXPR_LEN];
+	//is value necessary?
 } WP;
 
 static WP wp_pool[NR_WP] = {};
@@ -36,8 +38,60 @@ void init_wp_pool() {
   }
 
   head = NULL;
-  free_ = wp_pool;
+  free_ = wp_pool; //from array head.
 }
 
 /* TODO: Implement the functionality of watchpoint */
+WP* new_wp() {
+	if (free_ == NULL){
+		printf("There's no free watch point.\n");
+		assert(0);
+	}
 
+	//necessarity of tail?
+	//because there's only head now, so...
+	if (head == NULL) {
+		head = wp_pool;
+		free_ = wp_pool->next;
+		head->next = NULL;
+		return head;
+	}
+
+	WP* temp;
+
+	temp = free_;
+	free_ = free_->next;
+	temp->next = head;
+	head = temp;
+
+	return head;
+}
+bool free_wp(WP *wp) {
+	if (wp == NULL) {
+		printf("NULL watchpoint.\n");
+		return false;
+	}
+	if (head == NULL) {
+		printf("There's no used watchpoint.\n");
+		return false;
+	}
+
+	for (WP* p = head, prior; p != NULL; p = p->next) {
+		if (p == wp) {
+			if (p == head) {
+				head = head->next;
+				p->next = free_;
+				free_ = p;
+			}
+			else {
+				prior->next = p->next;
+				p->next = free_;
+				free_ = p;
+			}
+			return true;
+		}
+		last = p;
+	}
+	printf("The passed WP is not in wp_pool now!\n");
+	return false;
+}
