@@ -201,16 +201,15 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 	return outside_match;
 		
 }
-static bool check_deref_expr(uint32_t p, uint32_t q) {
-	if (tokens[p].type != TK_DEREF)
-		return false;
+static bool check_deref_expr(uint32_t p, uint32_t q) { //if * <multi-expr>?
+	return tokens[p].type == TK_DEREF;
 	//int word_size = sizeof(word_t);
-	switch (tokens[q].type) {
-		case TK_NUM: case TK_HEX:case TK_REG:
-			return true;
-		default:
-			return false;
-	}
+//	switch (tokens[q].type) {
+//		case TK_NUM: case TK_HEX:case TK_REG:
+//			return true;
+//		default:
+//			return false;
+//	}
 }
 static word_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
@@ -232,13 +231,10 @@ static word_t eval(uint32_t p, uint32_t q) {
 			// TODO:
 	
 	}
-	else if (check_parentheses(p, q) == true) {
-		if (check_deref_expr(p, q) == true) {
-			return vaddr_read(eval(q, q), sizeof(word_t));
-		}
-		else {
+	else if (check_parentheses(p, q) == true) {//Cannot use for no parenthses but legal expr!
+		//		else {
 			return eval(p + 1, q - 1);
-		}
+		//}
 	}
 	else {
 		//parentheses unmatch || no parenthses but legal
@@ -248,6 +244,10 @@ static word_t eval(uint32_t p, uint32_t q) {
 			//Log("Error: c_p detect BE, hence do no treat to the expr.\n");
 			return VAL_ERREXPR;
 		}
+		if (check_deref_expr(p, q) == true) {
+			return vaddr_read(eval(p + 1, q), sizeof(word_t));
+		}
+
 		//TODO:Multiple char op?
 		int main_opi = -1;
 		//size_t token_len;
