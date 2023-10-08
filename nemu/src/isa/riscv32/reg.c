@@ -41,7 +41,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 	int rfsize = MUXDEF(CONFIG_RVE, 16, 32);
 
 	for (int i = 0; i < rfsize; ++i) {
-		if (strcmp(regs[i], s) == 0) {
+		if (strcmp(regs[i], s+1) == 0) {
 			*success = true;
 
 			return cpu.gpr[i];
