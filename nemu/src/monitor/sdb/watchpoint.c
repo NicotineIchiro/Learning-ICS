@@ -76,7 +76,7 @@ bool free_wp(WP *wp) {
 		return false;
 	}
 
-	for (WP* p = head, prior; p != NULL; p = p->next) {
+	for (WP* p = head, *prior = NULL; p != NULL; p = p->next) {
 		if (p == wp) {
 			if (p == head) {
 				head = head->next;
@@ -90,7 +90,7 @@ bool free_wp(WP *wp) {
 			}
 			return true;
 		}
-		last = p;
+		prior = p;
 	}
 	printf("The passed WP is not in wp_pool now!\n");
 	return false;
