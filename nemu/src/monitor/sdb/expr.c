@@ -227,7 +227,7 @@ static word_t eval(uint32_t p, uint32_t q) {
 		else if  (tokens[p].type == TK_HEX)
 			return (word_t)strtoul(tokens[p].str, NULL, 16);
 		else // if (tokens[p].type == TK_REG)
-			return isa_reg_str2val(tokens[p].str + 1, &be_flag); //ignore the '$'
+			return isa_reg_str2val(tokens[p].str, &be_flag); //ignore the '$'
 			// TODO:
 	
 	}
