@@ -36,17 +36,15 @@ void isa_reg_display()
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
-	*success = false;
 
 	int rfsize = MUXDEF(CONFIG_RVE, 16, 32);
 
 	for (int i = 0; i < rfsize; ++i) {
 		if (strcmp(regs[i], s+1) == 0) {
-			*success = true;
-
 			return cpu.gpr[i];
 		}
 	}
+	*success = true;//be_flag = true;
 	Log("Failed to get reg value.\n");
   return 0;
 }
