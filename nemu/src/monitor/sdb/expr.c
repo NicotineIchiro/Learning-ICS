@@ -22,6 +22,7 @@
 #include <string.h>
 #include <debug.h>
 #include <ctype.h>
+#include <memory/vaddr.h>
 enum {
   TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_AND,
 
@@ -199,9 +200,22 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 
 	return outside_match;
 		
-} 
+}
+static bool check_deref_expr(uint32_t p, uint32_t q) {
+	if (tokens[p].type != TK_DEREF)
+		return false;
+	//int word_size = sizeof(word_t);
+	switch (tokens[q].type) {
+		case TK_NUM: case TK_HEX:case TK_REG:
+			return true;
+		default:
+			return false;
+	}
+}
 static word_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
+	//
+	//single num op in (p < q) or a extra elseif-branch?
 	if (p > q) {
 		be_flag = true;
 		Log("Error: Basic bad expression.");
@@ -211,11 +225,20 @@ static word_t eval(uint32_t p, uint32_t q) {
 		//terminology?
 		if (tokens[p].type == TK_NUM)
 			return atoi(tokens[p].str);
-		else
+		else if  (tokens[p].type == TK_HEX)
 			return (word_t)strtoul(tokens[p].str, NULL, 16);
+		else // if (tokens[p].type == TK_REG)
+			return isa_reg_str2val(tokens[p].str, &be_flag);
+			// TODO:
+	
 	}
 	else if (check_parentheses(p, q) == true) {
-		return eval(p + 1, q - 1);
+		if (check_deref_expr(p, q) == true) {
+			return vaddr_read(eval(q, q), sizeof(word_t));
+		}
+		else {
+			return eval(p + 1, q - 1);
+		}
 	}
 	else {
 		//parentheses unmatch || no parenthses but legal
@@ -296,7 +319,7 @@ static word_t eval(uint32_t p, uint32_t q) {
 					continue;
 			}
 		}
-		//TODO: reg and deref
+		//TODO: deref, simple eye op?
 		word_t val1 = eval(p, main_opi - 1);
 		word_t val2 = eval(main_opi + 1, q);
 		//if (be_flag)
@@ -308,6 +331,7 @@ static word_t eval(uint32_t p, uint32_t q) {
 			case '-': return val1 - val2;
 			case '*': return val1 * val2;
 			case '/': return val1 / val2;
+			//case TK_DEREF: return 
 			default: Assert(0, "No legal main operator!\n");
 		}
 	}

@@ -141,7 +141,7 @@ static int cmd_x(char *args)
 		const int cmdi = 5;
 		printf("%s\n", cmd_table[cmdi].description);
 	} else {
-		uint8_t N = atoi(argN);
+		uint8_t N = atoi(argN);//coz the addr space limit.
 		//vaddr_t b_addr = atoi(argExpr);
 		vaddr_t b_addr;
 		sscanf(argExpr, "%lx", &b_addr);
