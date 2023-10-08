@@ -1,0 +1,3 @@
+The "vim -t" is not always reliable, sometimes would jump to same name function in different directory.
+
+The vaddr_read reads multiple words , concating begin at high address, with every word LITTLE-ENDIAN(end byte at end)
