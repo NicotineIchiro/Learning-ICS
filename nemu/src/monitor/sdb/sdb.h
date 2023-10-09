@@ -20,4 +20,11 @@
 
 word_t expr(char *e, bool *success);
 
+struct watchpoint;
+typedef struct watchpoint WP;
+
+void init_wp_pool();
+WP* new_wp(const char * s);
+bool free_wp(WP *wp);
+
 #endif

@@ -62,6 +62,7 @@ static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char *args);
 static int cmd_p(char *args);
+static int cmd_w(char *args);
 
 static struct {
   const char *name;
@@ -76,7 +77,8 @@ static struct {
 	{ "si", "Usage: si [N] Execute N(default 1) instruction(s) then stop", cmd_si },
 	{ "info", "Usage: info [rw], r for test regs, w for test watching points", cmd_info },
 	{ "x", "Usage: x [N] Expr, read N words begin at address Expr", cmd_x },
-	{ "p", "Usage: p Expr, return the parse result", cmd_p}
+	{ "p", "Usage: p Expr, return the parse result", cmd_p},
+	{ "w", "Usage: w Expr, stop the program when expr value change.", cmd_w}
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -186,7 +188,10 @@ static int cmd_help(char *args) {
 	//TODO:stop.
   return 0;
 }
-
+static int cmd_w(char * args) {
+	WP* nwp = new_wp(args);
+		
+}
 void sdb_set_batch_mode() {
   is_batch_mode = true;
 }
