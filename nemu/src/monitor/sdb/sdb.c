@@ -76,9 +76,9 @@ static struct {
   /* TODO: Add more commands */
 	{ "si", "Usage: si [N] Execute N(default 1) instruction(s) then stop", cmd_si },
 	{ "info", "Usage: info [rw], r for test regs, w for test watching points", cmd_info },
-	{ "x", "Usage: x [N] Expr, read N words begin at address Expr", cmd_x },
-	{ "p", "Usage: p Expr, return the parse result", cmd_p},
-	{ "w", "Usage: w Expr, stop the program when expr value change.", cmd_w}
+	{ "x", "Usage: x [N] <expr>, read N words begin at address Expr", cmd_x },
+	{ "p", "Usage: p <expr>, return the value of <expr>.", cmd_p},
+	{ "w", "Usage: w <expr>, stop the program when <expr> value change.", cmd_w}
 };
 
 #define NR_CMD ARRLEN(cmd_table)
