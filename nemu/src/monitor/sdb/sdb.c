@@ -85,12 +85,26 @@ static struct {
 static bool parse_result;
 static int cmd_p(char *args)
 {
+	if (args == NULL) {
+		int cmd_i = 6;
+		printf("%s\n", cmd_table[cmd_i].description);
+
+		return -1;
+	}
 	parse_result = true;
 	//expr(args, &parse_result);
 	printf("Value: %lu\n", expr(args, &parse_result));
 	//Log("Reach here");	
 	return parse_result == true ? 0 : -1;
 }
+static int cmd_w(char * args) {
+	//if ()
+
+	new_wp(args);
+
+	return 0;
+}
+
 static int cmd_si(char *args)
 {
 	char *arg = strtok(NULL, " ");
@@ -187,11 +201,6 @@ static int cmd_help(char *args) {
 
 	//TODO:stop.
   return 0;
-}
-static int cmd_w(char * args) {
-	new_wp(args);
-
-	return 0;
 }
 void sdb_set_batch_mode() {
   is_batch_mode = true;
