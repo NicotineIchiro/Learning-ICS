@@ -38,4 +38,6 @@ WP* new_wp(char * s);
 bool free_wp(WP *wp);
 void wp_display();
 bool difftest_wp();
+void delete_wp(int NO);
+
 #endif

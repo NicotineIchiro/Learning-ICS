@@ -108,7 +108,18 @@ void wp_display() {
 
 	return;
 }
+void delete_wp(int NO) {
+	for (WP* pwp = head; pwp != NULL; pwp = pwp->next) {
+		if (pwp->NO == NO) {
+			free_wp(pwp);
+			printf("watchpoint %d already deleted.\n", pwp->NO);
+			return;
+		}
+	}
 
+	Log("Error: watchpoint %d has not used.\n", NO);
+	return;
+}
 bool difftest_wp() {
 	bool diff_flag = false;
 	bool eval_flag = true;

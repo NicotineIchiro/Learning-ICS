@@ -63,7 +63,7 @@ static int cmd_info(char *args);
 static int cmd_x(char *args);
 static int cmd_p(char *args);
 static int cmd_w(char *args);
-
+static int cmd_d(char *args);
 static struct {
   const char *name;
   const char *description;
@@ -78,10 +78,22 @@ static struct {
 	{ "info", "Usage: info [rw], r for test regs, w for test watching points", cmd_info },
 	{ "x", "Usage: x [N] <expr>, read N words begin at address Expr", cmd_x },
 	{ "p", "Usage: p <expr>, return the value of <expr>.", cmd_p},
-	{ "w", "Usage: w <expr>, stop the program when <expr> value change.", cmd_w}
+	{ "w", "Usage: w <expr>, stop the program when <expr> value change.", cmd_w},
+	{ "d", "Usage: d [N], free the NO.[N] watchpoint.", cmd_d}
 };
 
 #define NR_CMD ARRLEN(cmd_table)
+static int cmd_d(char *args) {
+	if (args == NULL) {
+		printf("%s\n", cmd_table[8].description);
+		return 0;
+	}
+
+	int NO = atoi(args);
+	delete_wp(NO);
+
+	return 0;
+}
 static bool parse_result;
 static int cmd_p(char *args)
 {
