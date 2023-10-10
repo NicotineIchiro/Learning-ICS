@@ -29,11 +29,12 @@ typedef struct watchpoint {
 
   /* TODO: Add more members if necessary */
 	//about the variable pointed.
-	int old_value;
+	int current_value;
 	char expr_str[WP_EXPR_LEN];
 	//is value necessary?
 } WP;
 
 WP* new_wp(const char * s);
 bool free_wp(WP *wp);
+void wp_display();
 #endif

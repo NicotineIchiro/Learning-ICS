@@ -89,4 +89,15 @@ bool free_wp(WP *wp) {
 	printf("The passed WP is not in wp_pool now!\n");
 	return false;
 }
+void wp_display() {
+	if (head == NULL) {
+		printf("No maintaining watchpoint now.\n");
+		return;
+	}
 
+	for (WP* pwp = head; pwp != NULL; pwp = pwp->next) {
+		printf("NO:%d\tvalue:%d\texpr:%s\n", pwp->NO, pwp->current_value, pwp->expr_str);
+	}
+
+	return;
+}

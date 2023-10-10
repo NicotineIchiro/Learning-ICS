@@ -143,12 +143,13 @@ static int cmd_info(char *args)
 		const int cmdi = 4;
 		printf("%s\n", cmd_table[cmdi].description);
 	}
-	else {
-		if (strcmp(arg, "r") == 0) {
-			isa_reg_display();
-		}
-		//TODO:: info w
+	else if (strcmp(arg, "r") == 0) {
+		isa_reg_display();
+	} 
+	else {	//TODO:: info w
+		wp_display();	
 	}
+	
 
 	return 0;
 }
