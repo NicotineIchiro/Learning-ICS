@@ -15,17 +15,7 @@
 
 #include "sdb.h"
 
-#define NR_WP 32
-#define EXPR_LEN 512
-typedef struct watchpoint {
-  int NO;
-  struct watchpoint *next;
 
-  /* TODO: Add more members if necessary */
-	//about the variable pointed.
-	char expr_str[EXPR_LEN];
-	//is value necessary?
-} WP;
 
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
@@ -91,7 +81,7 @@ bool free_wp(WP *wp) {
 				p->next = free_;
 				free_ = p;
 			}
-			memset(free_, 0, EXPR_LEN);
+			memset(free_, 0, WP_EXPR_LEN);
 			return true;
 		}
 		prior = p;
@@ -99,3 +89,4 @@ bool free_wp(WP *wp) {
 	printf("The passed WP is not in wp_pool now!\n");
 	return false;
 }
+

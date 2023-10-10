@@ -189,8 +189,9 @@ static int cmd_help(char *args) {
   return 0;
 }
 static int cmd_w(char * args) {
-	WP* nwp = new_wp(args);
-		
+	new_wp(args);
+
+	return 0;
 }
 void sdb_set_batch_mode() {
   is_batch_mode = true;
