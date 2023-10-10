@@ -98,7 +98,12 @@ static int cmd_p(char *args)
 	return parse_result == true ? 0 : -1;
 }
 static int cmd_w(char * args) {
-	//if ()
+	if (args == NULL) {
+		int cmd_i = 7;
+		printf("%s\n", cmd_table[cmd_i].description);
+
+		return 0;
+	}
 
 	new_wp(args);
 
