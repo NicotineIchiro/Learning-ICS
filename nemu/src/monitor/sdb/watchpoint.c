@@ -122,7 +122,7 @@ bool difftest_wp() {
 
 			printf("watchpoint %d: %s\n\n"
 					   "Old value = %lu\n"
-						 "New value = %lu", \
+						 "New value = %lu\n", \
 						 pwp->NO, pwp->expr_str, \
 						 pwp->current_value, \
 						 new_value);
