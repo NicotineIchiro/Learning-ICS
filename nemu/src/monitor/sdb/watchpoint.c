@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include "sdb.h"
+#include <cpu/cpu.h>
 #include <stdbool.h>
 
 
@@ -102,8 +103,31 @@ void wp_display() {
 	}
 
 	for (WP* pwp = head; pwp != NULL; pwp = pwp->next) {
-		printf("NO:%d\tvalue:%d\texpr:%s\n", pwp->NO, pwp->current_value, pwp->expr_str);
+		printf("NO:%d\tvalue:%lu\texpr:%s\n", pwp->NO, pwp->current_value, pwp->expr_str);
 	}
 
 	return;
+}
+
+bool difftest_wp() {
+	bool diff_flag = false;
+	bool eval_flag = true;
+	for (WP* pwp = head; pwp != NULL; pwp = pwp->next) {
+		word_t new_value;
+		new_value = expr(pwp->expr_str, &eval_flag);
+		assert(eval_flag == true);
+		
+		if (new_value != pwp->current_value) {
+			diff_flag = true;
+
+			printf("watchpoint %d: %s\n\n"
+					   "Old value = %lu\n"
+						 "New value = %lu", \
+						 pwp->NO, pwp->expr_str, \
+						 pwp->current_value, \
+						 new_value);
+			pwp->current_value = new_value;
+		}
+	}	
+	return diff_flag;
 }
