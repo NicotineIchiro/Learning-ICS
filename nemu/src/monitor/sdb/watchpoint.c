@@ -112,7 +112,7 @@ void delete_wp(int NO) {
 	for (WP* pwp = head; pwp != NULL; pwp = pwp->next) {
 		if (pwp->NO == NO) {
 			free_wp(pwp);
-			printf("watchpoint %d already deleted.\n", pwp->NO);
+			printf("watchpoint %d is already deleted.\n", NO);
 			return;
 		}
 	}
