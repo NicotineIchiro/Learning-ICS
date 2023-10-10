@@ -89,7 +89,7 @@ static int cmd_p(char *args)
 		int cmd_i = 6;
 		printf("%s\n", cmd_table[cmd_i].description);
 
-		return -1;
+		return 0;
 	}
 	parse_result = true;
 	//expr(args, &parse_result);
