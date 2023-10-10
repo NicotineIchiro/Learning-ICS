@@ -36,14 +36,18 @@ void isa_reg_display()
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
-
+	//extern CPU_state cpu;
 	int rfsize = MUXDEF(CONFIG_RVE, 16, 32);
 
+	if (strcmp(s+1, "pc") == 0) {
+		return cpu.pc;
+	}
 	for (int i = 0; i < rfsize; ++i) {
 		if (strcmp(regs[i], s+1) == 0) {
 			return cpu.gpr[i];
 		}
 	}
+	
 	*success = true;//be_flag = true;
 	Log("Failed to get reg value.\n");
   return 0;
