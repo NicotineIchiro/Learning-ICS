@@ -161,7 +161,7 @@ config DIFFTEST
     Note that this will significantly reduce the performance of NEMU.
 
 config WATCHPOINT
-	depends on TRACE && DIFFTEST
+	depends on DIFFTEST
 	bool "Enable watchpoint"
 	default n
 
