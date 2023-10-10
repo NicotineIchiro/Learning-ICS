@@ -34,7 +34,7 @@ typedef struct watchpoint {
 	//is value necessary?
 } WP;
 
-WP* new_wp(const char * s);
+WP* new_wp(char * s);
 bool free_wp(WP *wp);
 void wp_display();
 #endif
