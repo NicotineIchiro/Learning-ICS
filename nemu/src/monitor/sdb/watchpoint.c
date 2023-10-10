@@ -40,13 +40,16 @@ WP* new_wp(char * s) {
 
 	//necessarity of tail?
 	//because there's only head now, so...
+	//TODO: Don't insert when bad expr.
+	bool eval_flag = true;
+	word_t expr_result = expr(s, &eval_flag);
+	assert(eval_flag == true);
 	if (head == NULL) {
 		head = wp_pool;
 		free_ = wp_pool->next;
 		head->next = NULL;
 		strncpy(head->expr_str, s, strlen(s));
-		bool eval_flag = true;
-		head->current_value = expr(s, &eval_flag);
+		head->current_value = expr_result;
 		return head;
 	}
 
@@ -58,8 +61,7 @@ WP* new_wp(char * s) {
 	head = temp;
 
 	strncpy(head->expr_str, s, strlen(s));
-	bool eval_flag = true;
-	head->current_value = expr(s, &eval_flag);
+	head->current_value = expr_result;
 
 	return head;
 }
