@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
 //TEST GEN_EXPR
 
-	FILE * fp = fopen("./tmp/output.txt", "r");
+	FILE * fp = fopen("/tmp/output.txt", "r");
 	assert(fp != NULL);
 	uint64_t num, eval_result;
 	bool flag;
