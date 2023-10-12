@@ -12,7 +12,6 @@
 *
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
-
 #include <common.h>
 extern word_t expr(char *e, bool *success);
 void init_monitor(int, char *[]);
@@ -21,16 +20,7 @@ void engine_start();
 int is_exit_status_bad();
 char expr_buf[2048];
 char line_buf[2048];
-int main(int argc, char *argv[]) {
-  /* Initialize the monitor. */
-#ifdef CONFIG_TARGET_AM
-  am_init_monitor();
-#else
-  init_monitor(argc, argv);
-#endif
-
-//TEST GEN_EXPR
-
+void test_expr() {
 	FILE * fp = fopen("/tmp/output.txt", "r");
 	assert(fp != NULL);
 	uint64_t num, eval_result;
@@ -45,6 +35,18 @@ int main(int argc, char *argv[]) {
 						 eval_result, num);
 	}
 	fclose(fp);
+
+}
+
+int main(int argc, char *argv[]) {
+  /* Initialize the monitor. */
+#ifdef CONFIG_TARGET_AM
+  am_init_monitor();
+#else
+  init_monitor(argc, argv);
+#endif
+
+
 
   /* Start engine. */
   engine_start();
