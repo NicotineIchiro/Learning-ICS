@@ -26,8 +26,8 @@ static char *code_format =
 "#include <stdio.h>\n"
 "#include <stdint.h>\n"
 "int main() { "
-"  unsigned result = %s; "
-"  printf(\"%%u\", result); "
+"  uint64_t result = %s; "
+"  printf(\"%%lu\", result); "
 "  return 0; "
 "}";
 
@@ -207,12 +207,12 @@ int main(int argc, char *argv[]) {
     fp = popen("/tmp/.expr", "r");
     assert(fp != NULL);
 
-    int result;//Originally int.
-    ret = fscanf(fp, "%d", &result);
+    uint64_t result;//Originally int.
+    ret = fscanf(fp, "%lu", &result);
     pclose(fp);
 
 		//TODO: Only printf if no warning.
-    printf("%u %s\n", result, buf);
+    printf("%lu %s\n", result, buf);
   }
   return 0;
 }
