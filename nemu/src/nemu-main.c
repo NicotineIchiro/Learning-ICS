@@ -21,7 +21,7 @@ int is_exit_status_bad();
 char expr_buf[2048];
 char line_buf[2048];
 void test_expr() {
-	FILE * fp = fopen("/tmp/output.txt", "r");
+	FILE * fp = fopen("/tmp/output10000.txt", "r");
 	assert(fp != NULL);
 	uint64_t num, eval_result;
 	bool flag;
