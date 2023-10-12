@@ -24,6 +24,7 @@ static char buf[65536] = {};
 static char code_buf[65536 + 128] = {}; // a little larger than `buf`
 static char *code_format =
 "#include <stdio.h>\n"
+"#include <stdint.h>\n"
 "int main() { "
 "  uint64_t result = %s; "
 "  printf(\"%%lu\", result); "
@@ -180,28 +181,28 @@ int main(int argc, char *argv[]) {
     fclose(fp);
 
 
-    int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
-    //int ret = system("gcc /tmp/.code.c -o /tmp/.expr 2> /tmp/.compErr");
+    //int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
+    int ret = system("gcc /tmp/.code.c -o /tmp/.expr 2> /tmp/.compErr");
     if (ret != 0) continue;
 
 
 		//Simply throw the expr that 
 		//trigger compile time error/warning.
-//		FILE * cp;
-//		cp = fopen("/tmp/.compErr", "r");
-//		assert(cp != NULL);
-			
-//		char errbuf[1024];
-//		int errflag;
-//		errflag = 0;
-//		if (fgets(errbuf, 1024, cp) != NULL) {
-//			errflag = 1;
-//			i--;
-//			//printf("Error detected, once a more\n");
-//		}
-//		memset(errbuf, 0, 1024);
-//		fclose(cp);
-//		if (errflag)	continue;
+		FILE * cp;
+		cp = fopen("/tmp/.compErr", "r");
+		assert(cp != NULL);
+		
+		char errbuf[1024];
+		int errflag;
+		errflag = 0;
+		if (fgets(errbuf, 1024, cp) != NULL) {
+			errflag = 1;
+			i--;
+			//printf("Error detected, once a more\n");
+		}
+		memset(errbuf, 0, 1024);
+		fclose(cp);
+		if (errflag)	continue;
 
     fp = popen("/tmp/.expr", "r");
     assert(fp != NULL);
