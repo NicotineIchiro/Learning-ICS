@@ -35,7 +35,7 @@ void test_expr() {
 						 eval_result, num);
 	}
 	fclose(fp);
-
+	exit(0);
 }
 
 int main(int argc, char *argv[]) {
