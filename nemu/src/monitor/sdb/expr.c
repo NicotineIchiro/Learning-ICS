@@ -27,7 +27,7 @@ enum {
   TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_AND,
 
   /* TODO: Add more token types */
-	TK_NUM, TK_HEX, TK_REG, TK_DEREF
+	TK_NUM, TK_HEX, TK_REG, TK_NEGOP, TK_DEREF
 };
 const uint32_t VAL_ERREXPR = (uint32_t)(-1);
 static struct rule {
@@ -119,7 +119,7 @@ static bool make_token(char *e) {
 						if (nr_token == 0 || tokens[nr_token-1].type == '(' || tokens[nr_token-1].type == '/' || tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '-') {
 							//TODO: Ignoring minus list.
 							strncpy(tokens[nr_token].str, substr_start, substr_len);
-							tokens[nr_token].type = rules[i].token_type == '-' ? TK_NUM : TK_DEREF;
+							tokens[nr_token].type = rules[i].token_type == '-' ? TK_NEGOP : TK_DEREF;
 							nr_token++;
 							break;							
 						}
@@ -132,11 +132,9 @@ static bool make_token(char *e) {
 						//Assert(substr_len < TOKEN_LEN, "Single token buffer overflow!\n");
 						//Single of is treated in in front of switch.
 						//if in front of num there is a NUM type '-', cat the num after the '-'
-						if (nr_token > 0 && strcmp(tokens[nr_token-1].str, "-") == 0 && tokens[nr_token-1].type == TK_NUM) {
-							strncat(tokens[nr_token-1].str, substr_start, substr_len);
-							//nr_token++;
-							break;		
-						}
+						//if (nr_token > 0 && strcmp(tokens[nr_token-1].str, "-") == 0 && tokens[nr_token-1].type == TK_NUM) {
+							//strncat(tokens[nr_token-1].str, substr_start, substr_len);
+							//nr_token++;	
 					case TK_REG:
 						//TODO..
 					case TK_HEX:
@@ -145,7 +143,6 @@ static bool make_token(char *e) {
 						nr_token++;
 						break;
 						
-						break;
           default:
 						i = NR_REGEX - 1;
 						break;
@@ -201,8 +198,8 @@ static bool check_parentheses(uint32_t p, uint32_t q) {
 	return outside_match;
 		
 }
-static bool check_deref_expr(uint32_t p, uint32_t q) { //if * <multi-expr>?
-	return tokens[p].type == TK_DEREF;
+static bool check_deref_expr(uint32_t i) { //if * <multi-expr>?
+	return tokens[i].type == TK_DEREF;
 	//int word_size = sizeof(word_t);
 //	switch (tokens[q].type) {
 //		case TK_NUM: case TK_HEX:case TK_REG:
@@ -210,6 +207,9 @@ static bool check_deref_expr(uint32_t p, uint32_t q) { //if * <multi-expr>?
 //		default:
 //			return false;
 //	}
+}
+static bool check_neg_expr(uint32_t i) {
+	return tokens[i].type == TK_NEGOP;
 }
 static word_t eval(uint32_t p, uint32_t q) {
 	//end eval when meet illegal expr.
@@ -244,8 +244,11 @@ static word_t eval(uint32_t p, uint32_t q) {
 			//Log("Error: c_p detect BE, hence do no treat to the expr.\n");
 			return VAL_ERREXPR;
 		}
-		if (check_deref_expr(p, q) == true) {
+		if (check_deref_expr(p) == true) {
 			return vaddr_read(eval(p + 1, q), sizeof(word_t));
+		}
+		if (check_neg_expr(p) == true) {
+			return -eval(p + 1, q);
 		}
 
 		//TODO:Multiple char op?
