@@ -9,3 +9,5 @@ The cross-file function action can be declared by extra header file or extern(No
 现阶段单目运算符还无法支持表达式！
 
 负数繁分数有问题！（因暂时以无符号int存储补码负数编码）
+
+KISS: 先做PA1吧。目前cmd_p Error率在1%～2%,尚可容忍。之后每天寻找cmd_p的问题。
