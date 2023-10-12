@@ -25,7 +25,7 @@ void test_expr() {
 	assert(fp != NULL);
 	uint64_t num, eval_result;
 	bool flag;
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 10000; ++i) {
 		fgets(line_buf, 2048, fp);
 		sscanf(line_buf, "%lu %s", &num, expr_buf);
 		if ((eval_result = expr(expr_buf, &flag)) != num)
