@@ -5,3 +5,5 @@ The vaddr_read reads multiple words , concating begin at high address, with ever
 
 
 The cross-file function action can be declared by extra header file or extern(Non-static);
+
+现阶段单目运算符还无法支持表达式！
