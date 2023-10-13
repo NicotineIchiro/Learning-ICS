@@ -31,7 +31,7 @@ void isa_reg_display()
 	//register file size.
 
 	for (int i = 0, j = 0; i < rfsize; ++i) {
-		printf("%s\t0x%16lx\t%16lu%c", regs[i], cpu.gpr[i], cpu.gpr[i], j++ % 2 ? '\n' : '\t');		
+		printf("%s\t0x%lx\t%lu%c", regs[i], cpu.gpr[i], cpu.gpr[i], j++ % 2 ? '\n' : '\t');		
 	}
 }
 
