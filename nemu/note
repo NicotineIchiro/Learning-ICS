@@ -14,3 +14,6 @@ KISS: 先做PA2吧。目前cmd_p Error率在1%～2%,尚可容忍。之后每天�
 
 指令实现：根据功能（立即数编码/整数计算/控制转移/内存加载与存储/Memory Ordering/Environmental call & breakpoints）
 								以及操作数个数和类型两方面，在手册的Instruction Set章节中寻找参考指令格式。
+
+rv-E的JAL是jump and link,不是above...，不要以x86的认知想当然!
+	采用相对寻址。

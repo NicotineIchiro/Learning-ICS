@@ -20,6 +20,7 @@
 // but it is ok since we do not access the array directly
 static const uint32_t img [] = {
 	0x00001413,	 // li s0,1   waiting for full test.
+							 // now use the inner case first.
   0x00000297,  // auipc t0,0
   0x00028823,  // sb  zero,16(t0)
   0x0102c503,  // lbu a0,16(t0)
