@@ -187,7 +187,7 @@ static int cmd_x(char *args)
 			iaddr = b_addr + i * 4;
 			iword = vaddr_read(iaddr, 4);
 
-			printf("%lx:\t%x\n", iaddr, iword);
+			printf("%lx:\t%08x\n", iaddr, iword);
 		}	
 	}
 	return 0;
