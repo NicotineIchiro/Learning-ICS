@@ -105,7 +105,7 @@ static int cmd_p(char *args)
 	}
 	parse_result = true;
 	word_t ret_val = expr(args, &parse_result);
-	printf("Value: %lu\t%lx\n", ret_val, ret_val);
+	printf("Value: %lu\t0x%08lx\n", ret_val, ret_val);
 	//Log("Reach here");	
 	return parse_result == true ? 0 : -1;
 }
