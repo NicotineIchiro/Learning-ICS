@@ -24,6 +24,7 @@
 
 enum {
   TYPE_I, TYPE_U, TYPE_S, TYPE_J, TYPE_B, TYPE_R,
+	TYPE_RW,
   TYPE_N, // none
 };
 //TODO.. the diff between W-ext and normal(32bit) inst?
@@ -33,6 +34,8 @@ enum {
 
 #define src1R() do { *src1 = R(rs1); } while (0)
 #define src2R() do { *src2 = R(rs2); } while (0)
+#define src1RW() do { *src1 = WWORD(R(rs1)); } while(0)
+#define src2RW() do { *src2 = WWORD(R(rs2)); } while(0)
 #define immI() do { *imm = SEXT(BITS(i, 31, 20), 12); } while(0)
 #define immU() do { *imm = SEXT(BITS(i, 31, 12), 20) << 12; } while(0)
 #define immS() do { *imm = (SEXT(BITS(i, 31, 25), 7) << 5) | BITS(i, 11, 7); } while(0)
@@ -48,10 +51,14 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
     case TYPE_I: src1R();          immI(); break;
     case TYPE_U:                   immU(); break;
     case TYPE_S: src1R(); src2R(); immS(); break;
-		//j
+		//my implement.
 		case TYPE_J:									 immJ(); break;
 		case TYPE_B: src1R(); src2R(); immB(); break;
 		case TYPE_R: src1R(); src2R();				 break;
+
+
+		//rv64i W-extension.
+		case TYPE_RW: src1RW(); src2RW();			 break;
   }
 }
 
@@ -78,6 +85,7 @@ static int decode_exec(Decode *s) {
 	INSTPAT("??????? ????? ????? 000 ????? 00110 11", addiw  , I, R(rd) = src1 + imm);
 	INSTPAT("0000000 ????? ????? 000 ????? 01110 11", addw	 , R, R(rd) = src1 + src2);
 	INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub    , R, R(rd) = src1 - src2);
+	INSTPAT("0000001 ????? ????? 000 ????? 01110 11", mulw	 , RW, R(rd) = WWORD(src1 * src2));
 		//bitwise comp.
 	INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , I, R(rd) = SEXT(src1, 64) >> BITS(imm, 4, 0));
 	INSTPAT("0000000 ????? ????? 101 ????? 00110 11", srliw  , I, R(rd) = src1 >> BITS(imm, 4, 0));
