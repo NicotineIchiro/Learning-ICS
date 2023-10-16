@@ -24,7 +24,7 @@
 
 enum {
   TYPE_I, TYPE_U, TYPE_S, TYPE_J, TYPE_B, TYPE_R,
-	TYPE_RW,
+	TYPE_RW, TYPE_IW,
   TYPE_N, // none
 };
 //TODO.. the diff between W-ext and normal(32bit) inst?
@@ -62,6 +62,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
 
 		//rv64i W-extension.
 		case TYPE_RW: src1RW(); src2RW();			 break;
+		case TYPE_IW: src1RW();        immI(); break;
   }
 }
 
@@ -95,6 +96,7 @@ static int decode_exec(Decode *s) {
 	INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai   , I, R(rd) = SEXT(src1, 64) >> BITS(imm, 4, 0));
 	INSTPAT("0000000 ????? ????? 101 ????? 00110 11", srliw  , I, R(rd) = src1 >> BITS(imm, 4, 0));
 	INSTPAT("0000000 ????? ????? 001 ????? 01110 11", sllw   , R, R(rd) = src1 << BITS(src2, 4, 0));
+	INSTPAT("0000000 ????? ????? 001 ????? 00110 11", slliw  , IW, R(rd) = WWORD(src1 << BITS(imm, 4, 0)));
 	INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and		 , R, R(rd) = src1 & src2);
 	INSTPAT("0000000 ????? ????? 111 ????? 00100 11", andi	 , I, R(rd) = src1 & imm);
 	INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or		 , R, R(rd) = src1 | src2);
