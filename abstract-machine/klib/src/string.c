@@ -27,7 +27,7 @@ char *strcpy(char *dst, const char *src) {
 
 	size_t lensrc = strlen(src);
 	
-	memmove((void *)dst, (void *)src, lensrc);
+	memmove(dst, src, lensrc);
 	attach_zero(dst, lensrc);
 
 	return dst;
@@ -39,7 +39,7 @@ char *strncpy(char *dst, const char *src, size_t n) {
 	if (CHECK_DOUBLE_NULL(dst, src)) {
 		panic("strncpy(): NULL arg!");
 	}
-	memmove((void *)dst, (void *)src, n);
+	memmove(dst, src, n);
 	attach_zero(dst, n);	
 
 	return dst;
@@ -49,7 +49,7 @@ char *strncpy(char *dst, const char *src, size_t n) {
 char *strcat(char *dst, const char *src) {
 	size_t lendst = strlen(dst), lensrc = strlen(src);
 
-	memmove((void *)dst + lendst, (void *)src, lensrc);
+	memmove(dst + lendst, src, lensrc);
 	attach_zero(dst, lendst + lensrc);
 
 	if (strlen(dst) != lensrc + lendst) {
