@@ -177,7 +177,7 @@ static int cmd_x(char *args)
 	} else {
 		uint8_t N = atoi(argN);//coz the addr space limit.
 		//vaddr_t b_addr = atoi(argExpr);
-		vaddr_t b_addr;
+		vaddr_t b_addr;//waiting for expr.
 		sscanf(argExpr, "%lx", &b_addr);
 
 		for (uint8_t i = 0; i < N; ++i) {

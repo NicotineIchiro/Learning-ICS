@@ -3,9 +3,9 @@
 #include <stdint.h>
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
-#define CHECK_DOUBLE_NULL(a, b) (a == NULL || b == NULL)
+#define CHECK_DOUBLE_NULL(a, b) ((a) == NULL || (b) == NULL)
 
-static void attach_zero(char * s, size_t len) {
+static void __attribute__((noinline)) attach_zero(char * s, size_t len) {
 	s[len] = '\0';
 }
 size_t strlen(const char *s) {
@@ -103,7 +103,8 @@ void *memmove(void *dst, const void *src, size_t n) {
 	}
 	
 
-	unsigned char temp[n], * _src = (unsigned char *) src, * _dst = (unsigned char *) dst;
+	unsigned char temp[n];
+	unsigned char* _src = (unsigned char *) src, * _dst = (unsigned char *) dst;
 	for (size_t i = 0; i < n; ++i)
 		temp[i] = _src[i];
 
