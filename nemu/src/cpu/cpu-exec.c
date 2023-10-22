@@ -30,7 +30,14 @@ CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
-
+#define MAX_INST_BUFSIZE 16
+static char inst_ring_buf[MAX_INST_BUFSIZE][256] = {};
+static uint32_t ring_index = -1;
+static void inst_print_ring() {
+	for (size_t i = 0; i < MAX_INST_BUFSIZE && inst_ring_buf[i][0] != '\0'; ++i) {
+		printf("%s %s\n", i == ring_index ? "  --> " : "      ", inst_ring_buf[i]);
+	}
+}
 void device_update();
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -38,6 +45,10 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #endif
 //Wrap the watchpoint code by macro to config.
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
+
+	ring_index = (ring_index + 1) % MAX_INST_BUFSIZE;
+	snprintf(inst_ring_buf[ring_index], strlen(_this->logbuf) + 1, _this->logbuf);
+
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 #ifdef CONFIG_WATCHPOINT
 	if (difftest_wp() == true) {
@@ -126,7 +137,9 @@ void cpu_exec(uint64_t n) {
     case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
 		//stop after executed n instructions.
 
-    case NEMU_END: case NEMU_ABORT:
+    case NEMU_END: case NEMU_ABORT:	
+			if (nemu_state.state == NEMU_ABORT || nemu_state.halt_ret != 0)							 
+				inst_print_ring();
       Log("nemu: %s at pc = " FMT_WORD,
           (nemu_state.state == NEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
            (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
