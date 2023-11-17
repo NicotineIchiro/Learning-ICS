@@ -20,13 +20,13 @@ size_t i2str(int n, char *str)
 	char tc;
 	i = 0;
 	
-	while (n != 0) { //生成逆转的itoa字符串
+	while (n != 0) { 
 		str[i] = n % 10 + '0';
 		n /= 10;
 		++i;
 	}
 
-	for (size_t j = 0; j < i / 2; ++j) {//将字符串翻转
+	for (size_t j = 0; j < i / 2; ++j) {
 																			//使之与数字顺序一致
 		tc = str[j];
 		str[j] = str[i - j - 1];
@@ -44,9 +44,12 @@ int sprintf(char *out, const char *fmt, ...)
 	va_list ap;
 	int temp = 0;
 	char *temps;
-	size_t i = 0;
-	int cnt = 0;
-	int errf = 0;
+	size_t i;
+	i = 0;
+	int cnt;
+	cnt = 0;
+	int errf;
+	errf = 0;
 
 	va_start(ap, fmt);
 		//size_t flen = strlen(fmt);
@@ -93,7 +96,7 @@ int sprintf(char *out, const char *fmt, ...)
 		}
 	}
 	
-	//out[cnt] = '\0';
+	out[cnt] = '\0';
 	va_end(ap);
 
 	return cnt;

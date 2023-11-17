@@ -29,6 +29,7 @@ override ARGS += $(ARGS_DIFF)
 # default open batch mode.
 override ARGS += -b
 #
+# override ARGS += --elf=$(BUILD_DIR)/hello-str-native
 # Command to execute NEMU
 IMG ?=
 NEMU_EXEC := $(BINARY) $(ARGS) $(IMG)
