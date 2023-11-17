@@ -138,6 +138,8 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 	size_t i = 0;
 
 	while (i < n && *((unsigned char *)s1 + i) == *((unsigned char *)s2 + i)) ++i;
+	if (i == n)
+		--i;//other wise the i will be in the first diff pos.
 
 	return *((unsigned char *)s1 + i) - *((unsigned char *)s2 + i);
 
