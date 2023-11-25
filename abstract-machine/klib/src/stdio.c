@@ -7,6 +7,8 @@
 
 int printf(const char *fmt, ...)
 {
+	//char *temp;
+
 	panic("Not implemented");
 }
 
@@ -101,7 +103,7 @@ int sprintf(char *out, const char *fmt, ...)
 
 	return cnt;
 
-	panic("Not implemented");
+	//panic("Not implemented");
 }
 
 int snprintf(char *out, size_t n, const char *fmt, ...)

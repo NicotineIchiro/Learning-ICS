@@ -88,15 +88,16 @@ static int cmd_d(char *args) {
 		printf("%s\n", cmd_table[8].description);
 		return 0;
 	}
-
+	
 	int NO = atoi(args);
 	delete_wp(NO);
-
+//	
 	return 0;
 }
 static bool parse_result;
 static int cmd_p(char *args)
 {
+		
 	if (args == NULL) {
 		int cmd_i = 6;
 		printf("%s\n", cmd_table[cmd_i].description);

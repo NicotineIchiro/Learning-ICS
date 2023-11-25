@@ -17,7 +17,7 @@ size_t strlen(const char *s) {
 	}
 	return end;
 
-  panic("Not implemented");
+  //panic("Not implemented");
 }
 
 char *strcpy(char *dst, const char *src) {
@@ -32,7 +32,7 @@ char *strcpy(char *dst, const char *src) {
 
 	return dst;
 
-  panic("Not implemented");
+  //panic("Not implemented");
 }
 
 char *strncpy(char *dst, const char *src, size_t n) {
@@ -43,7 +43,7 @@ char *strncpy(char *dst, const char *src, size_t n) {
 	attach_zero(dst, n);	
 
 	return dst;
-  panic("Not implemented");
+  //panic("Not implemented");
 }
 
 char *strcat(char *dst, const char *src) {
@@ -58,7 +58,7 @@ char *strcat(char *dst, const char *src) {
 
 	return dst;
 
-  panic("Not implemented");
+  //panic("Not implemented");
 }
 
 int strcmp(const char *s1, const char *s2) {
@@ -71,7 +71,7 @@ int strcmp(const char *s1, const char *s2) {
 	int dif_val = memcmp(s1, s2, lenmin);
 	return dif_val;
 
-  panic("Not implemented");
+  //panic("Not implemented");
 }
 
 int strncmp(const char *s1, const char *s2, size_t n) {
@@ -80,7 +80,7 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 	}
 	return memcmp(s1, s2, n);
 
-  panic("Not implemented");
+ // panic("Not implemented");
 }
 
 void *memset(void *s, int c, size_t n) {
@@ -139,7 +139,7 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 
 	while (i < n && *((unsigned char *)s1 + i) == *((unsigned char *)s2 + i)) ++i;
 	if (i == n)
-		--i;//other wise the i will be in the first diff pos.
+		--i;//other wise the i will be in the outside pos.
 
 	return *((unsigned char *)s1 + i) - *((unsigned char *)s2 + i);
 

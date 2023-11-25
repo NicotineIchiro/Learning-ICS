@@ -48,6 +48,7 @@ static char *img_file = NULL;
 static int difftest_port = 1234;
 
 static long load_img() {
+
   if (img_file == NULL) {
     Log("No image is given. Use the default build-in image.");
     return 4096; // built-in image size
@@ -68,8 +69,27 @@ static long load_img() {
   fclose(fp);
   return size;
 }
+static long load_elf() {
+	if (elf_file == NULL) {
+		Assert(0, "Unable to load '%s'", elf_file);
+	}
 
+	FILE *fp = fopen(elf_file, "rb");
+	Assert(fp, "Can not open '%s'", elf_file);
+
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	Log("The elf file is %s, size = %ld", elf_file, size);
+	
+	fseek(fp, 0, SEEK_SET);
+	int ret = fread(guest_to_host(RESET_VECTOR + 0x1000), size, 1, fp);
+	assert(ret == 1);
+	
+	fclose(fp);
+	return size;	
+}
 static int parse_args(int argc, char *argv[]) {
+				
   const struct option table[] = {
     {"batch"    , no_argument      , NULL, 'b'},
     {"log"      , required_argument, NULL, 'l'},
@@ -81,7 +101,7 @@ static int parse_args(int argc, char *argv[]) {
     {0          , 0                , NULL,  0 },
   };
   int o;
-  while ( (o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
+  while ( (o = getopt_long(argc, argv, "-bhl:d:p:e", table, NULL)) != -1) {
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
@@ -100,6 +120,7 @@ static int parse_args(int argc, char *argv[]) {
         exit(0);
     }
   }
+	
   return 0;
 }
 
@@ -114,7 +135,7 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Open the log file. */
   init_log(log_file);
-
+	
   /* Initialize memory. */
   init_mem();
 
@@ -125,7 +146,11 @@ void init_monitor(int argc, char *argv[]) {
   init_isa();
 
   /* Load the image to memory. This will overwrite the built-in image. */
-  long img_size = load_img();
+	long img_size;
+	if (elf_file == NULL)
+		img_size = load_img();
+	else
+		img_size = load_elf();
 
   /* Initialize differential testing. */
   init_difftest(diff_so_file, img_size, difftest_port);
