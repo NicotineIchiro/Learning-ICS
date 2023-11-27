@@ -69,6 +69,7 @@ static long load_img() {
   fclose(fp);
   return size;
 }
+#include <elf.h>
 static long load_elf() {
 	if (elf_file == NULL) {
 		Assert(0, "Unable to load '%s'", elf_file);
@@ -76,13 +77,13 @@ static long load_elf() {
 
 	FILE *fp = fopen(elf_file, "rb");
 	Assert(fp, "Can not open '%s'", elf_file);
-
+	//fseek: set the FILE INDICATOR in pos [whence + off] in fo
 	fseek(fp, 0, SEEK_END);
-	long size = ftell(fp);
+	long size = ftell(fp);//get off set of [FILE INICATOR to STREAM]
 	Log("The elf file is %s, size = %ld", elf_file, size);
 	
-	fseek(fp, 0, SEEK_SET);
-	int ret = fread(guest_to_host(RESET_VECTOR + 0x1000), size, 1, fp);
+	fseek(fp, 0x1000, SEEK_SET);//0x1000 is begin of the .text of the elf now.
+	int ret = fread(guest_to_host(RESET_VECTOR), size - 0x1000, 1, fp);
 	assert(ret == 1);
 	
 	fclose(fp);
