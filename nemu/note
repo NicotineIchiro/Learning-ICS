@@ -50,4 +50,21 @@ jal和sd实现有问题。
 ?为什么自己load_elf会是内置镜像？
 	成功把elf传给了NEMU，但没有成功加载到内存中。
 
-对于fseek, ftell, fread行为理解不透彻->RTFM，弄清楚参数和基本行为。
+	->对于fseek, ftell, fread行为理解不透彻->RTFM，弄清楚参数和基本行为。
+
+ELF文件的结构：
+	ELF file header: Elf_[32|64]Ehdr (Always at the offset ZERO)
+
+	then
+	Section Header or Program Header or both
+	The offset of above header are defined in ELF header.
+		By the e_phoff and e_shoff in Elf_Ehdr
+
+	Section header:  Elf_[32|64]Shdr							 AN ARRAY OF Elf_[32|64]Shdr
+	Program Header:(only in executable or relocable. )  AN ARRAY OF Elf_[32|64]Phdr 
+		Size specified by Elf_Ehdr.ephntsize and num by Elf_Ehdr.e_phnum
+		Member p_offset is the ? to file?
+	String and Symbol tables (one of the sections.)
+
+
+? .text开头究竟要从Section Header还是SymTab获取？

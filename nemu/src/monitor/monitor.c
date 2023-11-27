@@ -81,11 +81,45 @@ static long load_elf() {
 	fseek(fp, 0, SEEK_END);
 	long size = ftell(fp);//get off set of [FILE INICATOR to STREAM]
 	Log("The elf file is %s, size = %ld", elf_file, size);
+
+	//read ELF header
+	fseek(fp, 0, SEEK_SET);
+	Elf64_Ehdr * elf_fhp = (Elf64_Ehdr *)malloc(sizeof(Elf64_Ehdr));
+	int sign = fread(elf_fhp, sizeof(Elf64_Ehdr), 1, fp);
+	Assert(sign == 1, "Error when reading ELF header!");
+	Assert(elf_fhp->e_type == ET_EXEC, "The file type is not executable!");
+	printf("e_entry: %p\n"
+				 "e_phoff: 0x%lx\n"
+				 "e_shoff: 0x%lx\n"
+				 "e_ehsize: %hu\n"
+				 "e_phentsize: %hu\n"
+				 "e_shentsize: %hu\n", (void *)elf_fhp->e_entry, elf_fhp->e_phoff, elf_fhp->e_shoff, elf_fhp->e_ehsize, elf_fhp->e_phentsize, elf_fhp->e_shentsize);
+
+	Elf64_Shdr * elf_shp = (Elf64_Shdr *)malloc(elf_fhp->e_shentsize);
+	Elf64_Phdr * elf_php = (Elf64_Phdr *)malloc(elf_fhp->e_phentsize);
 	
+	if (elf_fhp->e_shnum != 0){
+		fseek(fp, elf_fhp->e_shoff, SEEK_SET);
+		fread(elf_shp, sizeof(Elf64_Shdr), 1, fp);
+	}
+	if (elf_fhp->e_phnum != 0){
+		fseek(fp, elf_fhp->e_phoff, SEEK_SET);
+		fread(elf_php, sizeof(Elf64_Phdr), 1, fp);
+	}	
+	//get .text offset to file.
+	for (int i = 0, shnum = elf_fhp->e_shnum; i < shnum; ++i) {//to find the .text header	
+					
+	}
+
+	//set the file indicator in the begin of code(.text)
 	fseek(fp, 0x1000, SEEK_SET);//0x1000 is begin of the .text of the elf now.
+																														//the begin to .text don't need to read in pmem.
 	int ret = fread(guest_to_host(RESET_VECTOR), size - 0x1000, 1, fp);
 	assert(ret == 1);
-	
+
+	free(elf_shp);
+	free(elf_php);
+	free(elf_fhp);
 	fclose(fp);
 	return size;	
 }
