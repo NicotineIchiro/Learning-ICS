@@ -88,37 +88,62 @@ static long load_elf() {
 	int sign = fread(elf_fhp, sizeof(Elf64_Ehdr), 1, fp);
 	Assert(sign == 1, "Error when reading ELF header!");
 	Assert(elf_fhp->e_type == ET_EXEC, "The file type is not executable!");
-	printf("e_entry: %p\n"
-				 "e_phoff: 0x%lx\n"
-				 "e_shoff: 0x%lx\n"
-				 "e_ehsize: %hu\n"
-				 "e_phentsize: %hu\n"
-				 "e_shentsize: %hu\n", (void *)elf_fhp->e_entry, elf_fhp->e_phoff, elf_fhp->e_shoff, elf_fhp->e_ehsize, elf_fhp->e_phentsize, elf_fhp->e_shentsize);
+//	printf("e_entry: %p\n"
+//				 "e_phoff: 0x%lx\n"
+//				 "e_shoff: 0x%lx\n"
+//				 "e_ehsize: %hu\n"
+//				 "e_phentsize: %hu\n"
+//				 "e_shentsize: %hu\n", (void *)elf_fhp->e_entry, elf_fhp->e_phoff, elf_fhp->e_shoff, elf_fhp->e_ehsize, elf_fhp->e_phentsize, elf_fhp->e_shentsize);
 
-	Elf64_Shdr * elf_shp = (Elf64_Shdr *)malloc(elf_fhp->e_shentsize);
-	Elf64_Phdr * elf_php = (Elf64_Phdr *)malloc(elf_fhp->e_phentsize);
-	
-	if (elf_fhp->e_shnum != 0){
+	//Section header table is AN ARRAY OF ElfN_Shdr begin at e_shoff
+	Elf64_Shdr * elf_shtp = NULL;
+	Elf64_Phdr * elf_phtp = NULL;
+
+	//get the two header table if none void.
+	if (elf_fhp->e_shnum != 0) {
+		elf_shtp = (Elf64_Shdr *)malloc(elf_fhp->e_shentsize * elf_fhp->e_shnum);
 		fseek(fp, elf_fhp->e_shoff, SEEK_SET);
-		fread(elf_shp, sizeof(Elf64_Shdr), 1, fp);
+		fread(elf_shtp, elf_fhp->e_shnum * sizeof(Elf64_Shdr), 1, fp);
 	}
 	if (elf_fhp->e_phnum != 0){
+		elf_phtp = (Elf64_Phdr *)malloc(elf_fhp->e_phentsize * elf_fhp->e_phnum);
 		fseek(fp, elf_fhp->e_phoff, SEEK_SET);
-		fread(elf_php, sizeof(Elf64_Phdr), 1, fp);
-	}	
-	//get .text offset to file.
+		fread(elf_phtp, elf_fhp->e_phnum * sizeof(Elf64_Phdr), 1, fp);
+	}
+
+	Elf64_Shdr textSh;
+	Elf64_Off textOffset = 0;//TODO: universal algo to find .text
+	//printf("sht[1].offset: 0x%lx\n", elf_shtp[1].sh_offset); //magic num. How can I know sht[1] is .text ?	
+	//
+	//Read the section header string table first..
+	Elf64_Shdr shstr = elf_shtp[elf_fhp->e_shstrndx];
+	Elf64_Addr shstrtab_base = shstr.sh_offset;
+	char * shstrtab = (char *)malloc(shstr.sh_size + 1);// read the whole tab.
+	memset(shstrtab, '\0', shstr.sh_size + 1);
+	fseek(fp, shstrtab_base, SEEK_SET);
+	fread(shstrtab, shstr.sh_size, 1, fp);
+
 	for (int i = 0, shnum = elf_fhp->e_shnum; i < shnum; ++i) {//to find the .text header	
-					
+		//unable to directly access, so should I fread? -> Yes!	
+		char * shstr_begin;
+		shstr_begin = shstrtab + elf_shtp[i].sh_name;
+		//confirm the section header is of .text
+		if (strcmp((const char *)shstr_begin, ".text") == 0) {
+			textSh = elf_shtp[i];
+			textOffset = textSh.sh_offset;	
+		}
 	}
 
 	//set the file indicator in the begin of code(.text)
-	fseek(fp, 0x1000, SEEK_SET);//0x1000 is begin of the .text of the elf now.
-																														//the begin to .text don't need to read in pmem.
-	int ret = fread(guest_to_host(RESET_VECTOR), size - 0x1000, 1, fp);
+	fseek(fp, textOffset, SEEK_SET);//0x1000 is begin of the .text of the elf now.
+		 																							//the begin to .text don't need to read in pmem.
+	//load the text into NEMU pmem.
+	int ret = fread(guest_to_host(RESET_VECTOR), size - textOffset, 1, fp);
 	assert(ret == 1);
 
-	free(elf_shp);
-	free(elf_php);
+	free(shstrtab);
+	free(elf_shtp);
+	free(elf_phtp);
 	free(elf_fhp);
 	fclose(fp);
 	return size;	

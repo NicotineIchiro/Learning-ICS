@@ -27,9 +27,9 @@ $(BINARY):: compile_git
 override ARGS ?= --log=$(BUILD_DIR)/nemu-log.txt
 override ARGS += $(ARGS_DIFF)
 # default open batch mode.
-#override ARGS += -b
+override ARGS += -b
 #
-override ARGS += --elf=$(BUILD_DIR)/add-riscv64-nemu.elf
+override ARGS += --elf=$(BUILD_DIR)/hello-str-riscv64-nemu.elf
 # Command to execute NEMU
 IMG ?=
 NEMU_EXEC := $(BINARY) $(ARGS) $(IMG)

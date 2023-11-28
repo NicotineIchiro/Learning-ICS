@@ -68,3 +68,10 @@ ELF文件的结构：
 
 
 ? .text开头究竟要从Section Header还是SymTab获取？
+	从section header的sh_off获取。
+
+但如何得知section header对应.text?
+	 ？ 如何找到symtab/strtab开头？
+	通过Elf_Nhdr->e_shstrndx? 但该项为.shstrtab的索引。
+	看起来&.shstrtab + sh_name即为段名字符串开头。  另外,shstrtab似乎不可读。因此需要fread。
+	但strtab和shstrtab区别是什么?
