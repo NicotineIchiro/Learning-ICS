@@ -71,7 +71,7 @@ static long load_img() {
 }
 #include <elf.h>
 char * Strtab = NULL;
-char * Symtab = NULL;
+Elf64_Sym * Symtab = NULL;
 void free_symstrtabs(){
 	free(Strtab);
 	free(Symtab);
@@ -111,12 +111,14 @@ static long load_elf() {
 	if (elf_fhp->e_shnum != 0) {
 		elf_shtp = (Elf64_Shdr *)malloc(elf_fhp->e_shentsize * elf_fhp->e_shnum);
 		fseek(fp, elf_fhp->e_shoff, SEEK_SET);
-		fread(elf_shtp, elf_fhp->e_shnum, elf_fhp->e_shentsize, fp);
+		int ret = fread(elf_shtp, elf_fhp->e_shentsize, elf_fhp->e_shnum, fp);
+		Assert(ret == elf_fhp->e_shnum, "Error when reading section headers!");
 	}
 	if (elf_fhp->e_phnum != 0){
 		elf_phtp = (Elf64_Phdr *)malloc(elf_fhp->e_phentsize * elf_fhp->e_phnum);
 		fseek(fp, elf_fhp->e_phoff, SEEK_SET);
-		fread(elf_phtp, elf_fhp->e_phnum, elf_fhp->e_phentsize, fp);
+		int ret = fread(elf_phtp, elf_fhp->e_phentsize, elf_fhp->e_phnum, fp);
+		Assert(ret == elf_fhp->e_phnum, "Error when reading program headers!");
 	}
 
 	Elf64_Shdr textSh;
@@ -145,14 +147,15 @@ static long load_elf() {
 		}
 		
 		//read the symtable
+		//TODO:WARNING: symtab is not string! is ARRAY OF ElfN_Sym!
 		if (!symtab_found && strcmp((const char *)shstr_begin, ".symtab") == 0) {
 			symtab_found = 1;
 			Elf64_Shdr symhdr = elf_shtp[i];
-			Symtab = (char *)malloc(symhdr.sh_size + 1);
-			memset(Symtab, '\0', symhdr.sh_size + 1);
+			Symtab = (Elf64_Sym *)malloc(symhdr.sh_size);
+			memset(Symtab, '\0', symhdr.sh_size);
 			fseek(fp, symhdr.sh_offset, SEEK_SET);
-			int ret = fread(Symtab, symhdr.sh_size, 1, fp);
-			Assert(ret == 1, "Error when reading symtab!");
+			int ret = fread(Symtab, sizeof(Elf64_Sym), symhdr.sh_size / sizeof(Elf64_Sym), fp);
+			Assert(ret == symhdr.sh_size / sizeof(Elf64_Sym), "Error when reading symtab!");
 		}
 		if (!strtab_found && strcmp((const char *)shstr_begin, ".strtab") == 0) {
 			strtab_found = 1;

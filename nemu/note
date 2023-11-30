@@ -76,8 +76,22 @@ ELF文件的结构：
 	看起来&.shstrtab + sh_name即为段名字符串开头。  另外,shstrtab似乎不可读。因此需要fread。
 	但strtab和shstrtab区别是什么?
 	以及如何找到strtab、symtab的位置？
-所有文件IO后都应该assert吗？
+所有文件IO后都应该assert吗？ 是的，首先帮助解决Fault.
 
 ？symtab和strtab读取后为空 <- 对应的shdr offset甚至超出文件大小?怎么回事？
 offset仍然超出，但将fread参数按手册定义修正后能够正确打印strtab：
 	RTFM，RTFM，RTFM，最初可以对已有代码照猫画虎，但明白大致功能后严格按定义操作。	
+仍然没有正确读取Symtab！
+Strtab前半段读对了，但尺寸也不对，说明shtp的读取有问题。
+
+注意：Symtab条目Elf64_Sym的st_shndx包含符号通往section header tables 的索引！
+?Symbol table 是不是连续的？
+读取有问题是否和align有关？align是否会影响结构数组的整体布局？
+彻底RTFM！ ElfN_Shdr->sh_entsize 对于本身为复合类型数组的Section规定了其每个元素的尺寸。
+从fhdr读取就有问题了！e_machine! 
+	补充： e_machine没问题 看起来没有按文档说的四字节对齐
+
+e_entry的含义：系统首次移交控制的虚拟地址？
+
+...目前看起来，读取section header array没有问题，只是一直误以为加载的是add，实际上加载了hello。
+	当数值看起来明显反常（例如超出程序边界时），不要钻牛角尖硬调，gdb打印不了的内存区域直接hd逐字节对照。
