@@ -70,6 +70,12 @@ static long load_img() {
   return size;
 }
 #include <elf.h>
+char * Strtab = NULL;
+char * Symtab = NULL;
+void free_symstrtabs(){
+	free(Strtab);
+	free(Symtab);
+}
 static long load_elf() {
 	if (elf_file == NULL) {
 		Assert(0, "Unable to load '%s'", elf_file);
@@ -100,15 +106,17 @@ static long load_elf() {
 	Elf64_Phdr * elf_phtp = NULL;
 
 	//get the two header table if none void.
+	//TODO: something wrong when reading shtp.
+	//fread arg2 is single size, arg3 is number of item to read.
 	if (elf_fhp->e_shnum != 0) {
 		elf_shtp = (Elf64_Shdr *)malloc(elf_fhp->e_shentsize * elf_fhp->e_shnum);
 		fseek(fp, elf_fhp->e_shoff, SEEK_SET);
-		fread(elf_shtp, elf_fhp->e_shnum * sizeof(Elf64_Shdr), 1, fp);
+		fread(elf_shtp, elf_fhp->e_shnum, elf_fhp->e_shentsize, fp);
 	}
 	if (elf_fhp->e_phnum != 0){
 		elf_phtp = (Elf64_Phdr *)malloc(elf_fhp->e_phentsize * elf_fhp->e_phnum);
 		fseek(fp, elf_fhp->e_phoff, SEEK_SET);
-		fread(elf_phtp, elf_fhp->e_phnum * sizeof(Elf64_Phdr), 1, fp);
+		fread(elf_phtp, elf_fhp->e_phnum, elf_fhp->e_phentsize, fp);
 	}
 
 	Elf64_Shdr textSh;
@@ -121,16 +129,39 @@ static long load_elf() {
 	char * shstrtab = (char *)malloc(shstr.sh_size + 1);// read the whole tab.
 	memset(shstrtab, '\0', shstr.sh_size + 1);
 	fseek(fp, shstrtab_base, SEEK_SET);
-	fread(shstrtab, shstr.sh_size, 1, fp);
+	int hret = fread(shstrtab, shstr.sh_size, 1, fp);
+	Assert(hret == 1, "Error when reading shstrtab!");
 
+	int text_found = 0, symtab_found = 0, strtab_found = 0;
 	for (int i = 0, shnum = elf_fhp->e_shnum; i < shnum; ++i) {//to find the .text header	
 		//unable to directly access, so should I fread? -> Yes!	
 		char * shstr_begin;
 		shstr_begin = shstrtab + elf_shtp[i].sh_name;
 		//confirm the section header is of .text
-		if (strcmp((const char *)shstr_begin, ".text") == 0) {
+		if (!text_found && strcmp((const char *)shstr_begin, ".text") == 0) {
+			text_found = 1;
 			textSh = elf_shtp[i];
 			textOffset = textSh.sh_offset;	
+		}
+		
+		//read the symtable
+		if (!symtab_found && strcmp((const char *)shstr_begin, ".symtab") == 0) {
+			symtab_found = 1;
+			Elf64_Shdr symhdr = elf_shtp[i];
+			Symtab = (char *)malloc(symhdr.sh_size + 1);
+			memset(Symtab, '\0', symhdr.sh_size + 1);
+			fseek(fp, symhdr.sh_offset, SEEK_SET);
+			int ret = fread(Symtab, symhdr.sh_size, 1, fp);
+			Assert(ret == 1, "Error when reading symtab!");
+		}
+		if (!strtab_found && strcmp((const char *)shstr_begin, ".strtab") == 0) {
+			strtab_found = 1;
+			Elf64_Shdr strhdr = elf_shtp[i];
+			Strtab = (char *)malloc(strhdr.sh_size + 1);
+			memset(Strtab, '\0', strhdr.sh_size + 1);
+			fseek(fp, strhdr.sh_offset, SEEK_SET);
+			int ret = fread(Strtab, strhdr.sh_size, 1, fp);
+			Assert(ret == 1, "Error when reading strtab!");
 		}
 	}
 
@@ -141,6 +172,7 @@ static long load_elf() {
 	int ret = fread(guest_to_host(RESET_VECTOR), size - textOffset, 1, fp);
 	assert(ret == 1);
 
+	//the global symtab and strtab free in engine_start()
 	free(shstrtab);
 	free(elf_shtp);
 	free(elf_phtp);

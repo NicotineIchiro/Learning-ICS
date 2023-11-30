@@ -16,7 +16,7 @@
 #include <cpu/cpu.h>
 
 void sdb_mainloop();
-
+extern void free_symstrtabs();
 void engine_start() {
 #ifdef CONFIG_TARGET_AM
   cpu_exec(-1);
@@ -24,4 +24,5 @@ void engine_start() {
   /* Receive commands from user. */
   sdb_mainloop();
 #endif
+	free_symstrtabs();
 }

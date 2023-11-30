@@ -75,3 +75,9 @@ ELF文件的结构：
 	通过Elf_Nhdr->e_shstrndx? 但该项为.shstrtab的索引。
 	看起来&.shstrtab + sh_name即为段名字符串开头。  另外,shstrtab似乎不可读。因此需要fread。
 	但strtab和shstrtab区别是什么?
+	以及如何找到strtab、symtab的位置？
+所有文件IO后都应该assert吗？
+
+？symtab和strtab读取后为空 <- 对应的shdr offset甚至超出文件大小?怎么回事？
+offset仍然超出，但将fread参数按手册定义修正后能够正确打印strtab：
+	RTFM，RTFM，RTFM，最初可以对已有代码照猫画虎，但明白大致功能后严格按定义操作。	
