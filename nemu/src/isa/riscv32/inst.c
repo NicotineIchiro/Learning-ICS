@@ -134,6 +134,29 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
 
+  const uint32_t OPFN_MASK = 0X707f, OP_MASK = 0X7f;
+	const uint32_t OP_JAL = 0x6f, OPFN_JALR = 0x67;
+#include <elf.h>
+	extern Elf64_Sym * Symtab;
+	extern char * Strtab;
+	//extern Elf64_Ehdr * elf_fhp;
+	extern int symtab_len;
+	if ((s->isa.inst.val & OPFN_MASK) == OPFN_JALR || (s->isa.inst.val & OP_MASK) == OP_JAL) {
+		// if is jalr zero, 0(ra) 
+		for (int i = 0; i < symtab_len; ++i) {
+			if (ELF64_ST_TYPE(Symtab[i].st_info) == STT_FUNC) {
+				Elf64_Addr func_base = Symtab[i].st_value, func_end = func_base + Symtab[i].st_size;
+				if (func_base <= s->dnpc && s->dnpc < func_end) {
+					if (imm == 0 && rd == 2) {
+						printf("ret: [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->dnpc);
+					}
+					else {
+						printf("call: [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->snpc);
+					}
+				}
+			}
+		}
+	}
   R(0) = 0; // reset $zero to 0
 
   return 0;
@@ -141,5 +164,7 @@ static int decode_exec(Decode *s) {
 
 int isa_exec_once(Decode *s) {
   s->isa.inst.val = inst_fetch(&s->snpc, 4);
+
+
   return decode_exec(s);
 }

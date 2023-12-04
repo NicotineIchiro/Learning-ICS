@@ -29,7 +29,7 @@ override ARGS += $(ARGS_DIFF)
 # default open batch mode.
 #override ARGS += -b
 #
-override ARGS += --elf=$(BUILD_DIR)/add-riscv64-nemu.elf
+override ARGS += --elf=$(BUILD_DIR)/recursion-riscv64-nemu.elf
 # Command to execute NEMU
 IMG ?=
 NEMU_EXEC := $(BINARY) $(ARGS) $(IMG)

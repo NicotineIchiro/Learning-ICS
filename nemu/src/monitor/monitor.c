@@ -70,11 +70,14 @@ static long load_img() {
   return size;
 }
 #include <elf.h>
+int symtab_len = 0;
 char * Strtab = NULL;
 Elf64_Sym * Symtab = NULL;
+Elf64_Ehdr * elf_fhp = NULL;
 void free_symstrtabs(){
 	free(Strtab);
 	free(Symtab);
+	free(elf_fhp);
 }
 static long load_elf() {
 	if (elf_file == NULL) {
@@ -90,7 +93,7 @@ static long load_elf() {
 
 	//read ELF header
 	fseek(fp, 0, SEEK_SET);
-	Elf64_Ehdr * elf_fhp = (Elf64_Ehdr *)malloc(sizeof(Elf64_Ehdr));
+	elf_fhp = (Elf64_Ehdr *)malloc(sizeof(Elf64_Ehdr));
 	int sign = fread(elf_fhp, sizeof(Elf64_Ehdr), 1, fp);
 	Assert(sign == 1, "Error when reading ELF header!");
 	Assert(elf_fhp->e_type == ET_EXEC, "The file type is not executable!");
@@ -147,16 +150,18 @@ static long load_elf() {
 		}
 		
 		//read the symtable
-		//TODO:WARNING: symtab is not string! is ARRAY OF ElfN_Sym!
+		//WARNING: symtab is not string! is ARRAY OF ElfN_Sym!
 		if (!symtab_found && strcmp((const char *)shstr_begin, ".symtab") == 0) {
 			symtab_found = 1;
 			Elf64_Shdr symhdr = elf_shtp[i];
 			Symtab = (Elf64_Sym *)malloc(symhdr.sh_size);
+			symtab_len = symhdr.sh_size;
 			memset(Symtab, '\0', symhdr.sh_size);
 			fseek(fp, symhdr.sh_offset, SEEK_SET);
 			int ret = fread(Symtab, sizeof(Elf64_Sym), symhdr.sh_size / sizeof(Elf64_Sym), fp);
 			Assert(ret == symhdr.sh_size / sizeof(Elf64_Sym), "Error when reading symtab!");
 		}
+		//read the string table.
 		if (!strtab_found && strcmp((const char *)shstr_begin, ".strtab") == 0) {
 			strtab_found = 1;
 			Elf64_Shdr strhdr = elf_shtp[i];
@@ -166,6 +171,7 @@ static long load_elf() {
 			int ret = fread(Strtab, strhdr.sh_size, 1, fp);
 			Assert(ret == 1, "Error when reading strtab!");
 		}
+		if (text_found && symtab_found && strtab_found) break;
 	}
 
 	//set the file indicator in the begin of code(.text)
@@ -179,7 +185,7 @@ static long load_elf() {
 	free(shstrtab);
 	free(elf_shtp);
 	free(elf_phtp);
-	free(elf_fhp);
+	//free(elf_fhp);
 	fclose(fp);
 	return size;	
 }
