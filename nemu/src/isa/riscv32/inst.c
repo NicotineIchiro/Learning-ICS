@@ -134,6 +134,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
 
+#ifdef CONFIG_FTRACE
   const uint32_t OPFN_MASK = 0X707f, OP_MASK = 0X7f;
 	const uint32_t OP_JAL = 0x6f, OPFN_JALR = 0x67;
 #include <elf.h>
@@ -147,16 +148,19 @@ static int decode_exec(Decode *s) {
 			if (ELF64_ST_TYPE(Symtab[i].st_info) == STT_FUNC) {
 				Elf64_Addr func_base = Symtab[i].st_value, func_end = func_base + Symtab[i].st_size;
 				if (func_base <= s->dnpc && s->dnpc < func_end) {
-					if (imm == 0 && rd == 2) {
+					printf("0x%08lx: ", cpu.pc);
+					if (imm == 0 && rd == 1) {
 						printf("ret: [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->dnpc);
 					}
 					else {
 						printf("call: [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->snpc);
 					}
+					break;
 				}
 			}
 		}
 	}
+#endif
   R(0) = 0; // reset $zero to 0
 
   return 0;
