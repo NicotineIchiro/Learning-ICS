@@ -21,7 +21,7 @@
 #define R(i) gpr(i)
 #define Mr vaddr_read
 #define Mw vaddr_write
-
+char ident_str[257] = "";
 enum {
   TYPE_I, TYPE_U, TYPE_S, TYPE_J, TYPE_B, TYPE_R,
 	TYPE_RW, TYPE_IW,
@@ -65,7 +65,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
 		case TYPE_IW: src1RW();        immI(); break;
   }
 }
-
+static int rec_depth = 0;
 static int decode_exec(Decode *s) {
   int rd = 0;
   word_t src1 = 0, src2 = 0, imm = 0;
@@ -149,11 +149,18 @@ static int decode_exec(Decode *s) {
 				Elf64_Addr func_base = Symtab[i].st_value, func_end = func_base + Symtab[i].st_size;
 				if (func_base <= s->dnpc && s->dnpc < func_end) {
 					printf("0x%08lx: ", cpu.pc);
-					if (imm == 0 && rd == 1) {
-						printf("ret: [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->dnpc);
+					int rs1 = BITS(s->isa.inst.val, 19, 15), rd = BITS(s->isa.inst.val, 11, 7); 
+					char * ident_end = ident_str + strlen(ident_str) - 1;
+					if (rd == 0 && imm == 0 && rs1 == 1) {//jalr zero, 0(ra)
+						rec_depth--;
+						Assert(rec_depth >= 0, "Error when detecting return!");
+						printf("%s", ident_end - rec_depth);						
+						printf("ret  [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->dnpc);
 					}
 					else {
-						printf("call: [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->snpc);
+						printf("%s", ident_end - rec_depth);
+						rec_depth++;
+						printf("call [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->snpc);
 					}
 					break;
 				}

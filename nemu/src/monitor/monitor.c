@@ -180,7 +180,12 @@ static long load_elf() {
 	//load the text into NEMU pmem.
 	int ret = fread(guest_to_host(RESET_VECTOR), size - textOffset, 1, fp);
 	assert(ret == 1);
-
+#ifdef CONFIG_FTRACE
+	extern char ident_str[257];
+	for (int i = 0; i < 257; ++i) {
+		ident_str[i] = i == 256 ? '\0' : ' ';
+	}
+#endif
 	//the global symtab and strtab free in engine_start()
 	free(shstrtab);
 	free(elf_shtp);
