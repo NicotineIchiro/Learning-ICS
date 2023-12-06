@@ -17,7 +17,7 @@
 
 extern uint64_t g_nr_guest_inst;
 FILE *log_fp = NULL;
-
+FILE *ftrace_fp = NULL;
 void init_log(const char *log_file) {
   log_fp = stdout;
   if (log_file != NULL) {
@@ -25,6 +25,10 @@ void init_log(const char *log_file) {
     Assert(fp, "Can not open '%s'", log_file);
     log_fp = fp;
   }
+#ifdef CONFIG_FTRACE
+	ftrace_fp = fopen("nemu-ftrace.txt", "w");
+	Assert(ftrace_fp, "Can not open nemu-ftrace.txt");
+#endif
   Log("Log is written to %s", log_file ? log_file : "stdout");
 }
 

@@ -24,5 +24,9 @@ void engine_start() {
   /* Receive commands from user. */
   sdb_mainloop();
 #endif
+#ifdef CONFIG_FTRACE
+	extern FILE * ftrace_fp;
+	fclose(ftrace_fp);
+#endif
 	free_symstrtabs();
 }

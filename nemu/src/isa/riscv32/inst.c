@@ -142,31 +142,33 @@ static int decode_exec(Decode *s) {
 	extern char * Strtab;
 	//extern Elf64_Ehdr * elf_fhp;
 	extern int symtab_len;
+	extern FILE *ftrace_fp;
 	if ((s->isa.inst.val & OPFN_MASK) == OPFN_JALR || (s->isa.inst.val & OP_MASK) == OP_JAL) {
 		// if is jalr zero, 0(ra) 
 		for (int i = 0; i < symtab_len; ++i) {
 			if (ELF64_ST_TYPE(Symtab[i].st_info) == STT_FUNC) {
 				Elf64_Addr func_base = Symtab[i].st_value, func_end = func_base + Symtab[i].st_size;
 				if (func_base <= s->dnpc && s->dnpc < func_end) {
-					printf("0x%08lx: ", cpu.pc);
+					fprintf(ftrace_fp, "0x%08lx: ", cpu.pc);
 					int rs1 = BITS(s->isa.inst.val, 19, 15), rd = BITS(s->isa.inst.val, 11, 7); 
 					char * ident_end = ident_str + strlen(ident_str) - 1;
 					if (rd == 0 && imm == 0 && rs1 == 1) {//jalr zero, 0(ra)
 						rec_depth--;
 						Assert(rec_depth >= 0, "Error when detecting return!");
-						printf("%s", ident_end - rec_depth);						
-						printf("ret  [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->dnpc);
+						fprintf(ftrace_fp, "%s", ident_end - rec_depth);						
+						fprintf(ftrace_fp, "ret  [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->dnpc);
 					}
 					else {
-						printf("%s", ident_end - rec_depth);
+						fprintf(ftrace_fp, "%s", ident_end - rec_depth);
 						rec_depth++;
-						printf("call [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->snpc);
+						fprintf(ftrace_fp, "call [%s@0x%08lx]\n", Strtab + Symtab[i].st_name, s->snpc);
 					}
 					break;
 				}
 			}
 		}
 	}
+	
 #endif
   R(0) = 0; // reset $zero to 0
 
