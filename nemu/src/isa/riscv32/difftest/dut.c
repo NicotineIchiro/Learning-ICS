@@ -18,7 +18,19 @@
 #include "../local-include/reg.h"
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
-  return false;
+	for (int i = 0; i < 32; ++i) {
+		if (ref_r->gpr[i] != cpu.gpr[i]) {
+			Log("Difftest: reg[%d] inconsistent.", i);
+			printf("ref.gpr[%d]:\t0x%08lx\n", i, ref_r->gpr[i]);
+			printf("dut.gpr[%d]:\t0x%08lx\n", i, cpu.gpr[i]);
+			return false;
+		}
+		if (ref_r->pc != cpu.pc) {
+			Log("Difftest: pc inconsistent.");
+			return false;
+		}
+	}
+	return true;
 }
 
 void isa_difftest_attach() {

@@ -28,5 +28,9 @@ void engine_start() {
 	extern FILE * ftrace_fp;
 	fclose(ftrace_fp);
 #endif
+#ifdef	CONFIG_MTRACE
+	extern FILE * mtrace_fp;
+	fclose(mtrace_fp);
+#endif
 	free_symstrtabs();
 }
