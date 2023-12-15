@@ -34,6 +34,12 @@ int printf(const char *fmt, ...)
 		{
 			switch (fmt[i + 1])
 			{
+			case 'c':
+				char tc;
+				tc = (char)va_arg(ap, int);
+				putch(tc);
+				i += 2;
+				cnt++;
 			case 'd':
 				temp = va_arg(ap, int);//the va_arg for %d is int!
 				char i2s[64] = {0};
