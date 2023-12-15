@@ -16,6 +16,8 @@
 #include "sdb.h"
 #include <cpu/cpu.h>
 #include <stdbool.h>
+#include <string.h>
+#include <strings.h>
 
 
 static WP wp_pool[NR_WP] = {};
@@ -27,7 +29,7 @@ void init_wp_pool() {
     wp_pool[i].NO = i;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
-
+	
   head = NULL;
   free_ = wp_pool; //from array head.
 }
@@ -49,7 +51,8 @@ WP* new_wp(char * s) {
 		head = wp_pool;
 		free_ = wp_pool->next;
 		head->next = NULL;
-		strncpy(head->expr_str, s, strlen(s));
+		memcpy(head->expr_str, s, strlen(s));
+		//bzero(head->expr_str + strlen(s), 1);
 		head->current_value = expr_result;
 		return head;
 	}
@@ -61,7 +64,7 @@ WP* new_wp(char * s) {
 	temp->next = head;
 	head = temp;
 
-	strncpy(head->expr_str, s, strlen(s));
+	memcpy(head->expr_str, s, strlen(s));
 	head->current_value = expr_result;
 
 	return head;
