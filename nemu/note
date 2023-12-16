@@ -111,3 +111,5 @@ Symtab 的Sym.st_name存储的为当前符号的名字字符串在Strtab中的�
 不确定配套功能应该放在哪个模块时可以grep查找文本，看看类似功能代码的所在模块。
 
 If fully havn't idea, read the pa doc again without one word skipped.
+
+KISS, step by step finish the system. Although doing benchmark, you can also use the difftest(but without wp and so on interactive debug stuff) to check your implementation.
